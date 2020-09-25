@@ -1,21 +1,47 @@
-import React, { Suspense, useCallback, useRef, useState } from "react"
-import { useFrame, useLoader } from "react-three-fiber"
-import { BackSide, DoubleSide, FrontSide, TextureLoader, Vector3 } from "three"
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react"
+import { extend, useFrame, useLoader } from "react-three-fiber"
+import {
+  AdditiveBlending,
+  BackSide,
+  DoubleSide,
+  FrontSide,
+  MultiplyBlending,
+  TextureLoader,
+  Vector3,
+  VideoTexture
+} from "three"
 import lerp from "lerp"
+import VideoMaterial from "./VideoMaterial"
+
+extend({ VideoMaterial })
 
 const Vinyl = React.forwardRef((props, ref) => {
-  const [map] = useLoader(TextureLoader, ["/vinyl.png"])
+  const [map, normalMap, bumpMap, specularMap] = useLoader(TextureLoader, [
+    "/vinyl.png",
+    "/vinyl-normal.png",
+    "/vinyl-bump.png",
+    "/vinyl-spec.png"
+  ])
 
   return (
-    <mesh {...props} ref={ref}>
-      <circleBufferGeometry attach="geometry" args={[1.25, 32]} />
+    <mesh {...props} ref={ref} castShadow receiveShadow>
+      <circleBufferGeometry attach="geometry" args={[1.25, 64]} />
       <meshPhongMaterial
-        specularMap={map}
+        //specularMap={specularMap}
+        //normalMap={normalMap}
         specular="white"
-        bumpMap={map}
+        //bumpMap={bumpMap}
         map={map}
+        //color="black"
         attach="material"
-        bumpScale={0.001}
+        bumpScale={-0.1}
         side={DoubleSide}
       />
     </mesh>
@@ -29,7 +55,7 @@ function Side({ textureUrl, materialProps, ...props }) {
   ])
 
   return (
-    <mesh position={[0, 0, 0]} {...props}>
+    <mesh position={[0, 0, 0]} {...props} castShadow receiveShadow>
       <planeBufferGeometry attach="geometry" args={[3, 3, 1]} />
       <meshPhongMaterial
         specularMap={bumpMap}
@@ -38,6 +64,28 @@ function Side({ textureUrl, materialProps, ...props }) {
         map={map}
         attach="material"
         {...materialProps}
+      />
+    </mesh>
+  )
+}
+
+function Video({ ...props }) {
+  const material = useRef()
+  const texture = useMemo(() => {
+    return new VideoTexture(document.getElementById("video"))
+  })
+
+  useFrame(({ clock }) => {
+    material.current.uniforms.time.value = clock.getElapsedTime() * 0.25
+  })
+
+  return (
+    <mesh position={[0, 0, 0]} {...props}>
+      <planeBufferGeometry attach="geometry" args={[3, 3, 1]} />
+      <videoMaterial
+        ref={material}
+        uniforms-tInput-value={texture}
+        attach="material"
       />
     </mesh>
   )
@@ -63,8 +111,6 @@ export default function LP() {
   )
 
   let rotation = 0
-
-  console.log({ vinyl })
 
   useFrame(({ clock }) => {
     //group.current.rotation.set(0, clock.getElapsedTime(), 0)
@@ -92,6 +138,16 @@ export default function LP() {
 
     group.current.rotation.y = lerp(group.current.rotation.y, rotation, 0.05)
   })
+
+  useEffect(() => {
+    const video = document.getElementById("video")
+    document.addEventListener("click", function () {
+      console.log("x")
+      if (showVinyl === 2) {
+        video.play()
+      }
+    })
+  }, [showVinyl])
 
   return (
     <>
@@ -129,6 +185,7 @@ export default function LP() {
           ref={vinyl}
           position={[0, 0.5, -0.01]}
         />
+        {showVinyl === 2 && <Video position={[0, 0, 0.1]} />}
       </group>
     </>
   )

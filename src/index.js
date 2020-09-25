@@ -9,7 +9,7 @@ function App() {
     <Canvas
       camera={{
         fov: 50,
-        position: [0, 0, 5]
+        position: [0, 0, 6]
       }}>
       <Scene />
     </Canvas>
