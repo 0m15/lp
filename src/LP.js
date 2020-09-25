@@ -24,10 +24,10 @@ extend({ VideoMaterial })
 
 const Vinyl = React.forwardRef((props, ref) => {
   const [map, normalMap, bumpMap, specularMap] = useLoader(TextureLoader, [
-    "/vinyl.png",
-    "/vinyl-normal.png",
-    "/vinyl-bump.png",
-    "/vinyl-spec.png"
+    "/vinyl-a.png",
+    "/vinyl-a-normal.png",
+    "/vinyl-a-bump.png",
+    "/vinyl-a-spec.png"
   ])
 
   return (
@@ -35,13 +35,12 @@ const Vinyl = React.forwardRef((props, ref) => {
       <circleBufferGeometry attach="geometry" args={[1.25, 64]} />
       <meshPhongMaterial
         //specularMap={specularMap}
-        //normalMap={normalMap}
-        specular="white"
-        //bumpMap={bumpMap}
+        normalMap={normalMap}
+        specular="grey"
+        bumpMap={bumpMap}
         map={map}
-        //color="black"
         attach="material"
-        bumpScale={-0.1}
+        bumpScale={0.001}
         side={DoubleSide}
       />
     </mesh>

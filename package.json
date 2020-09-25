@@ -9,8 +9,10 @@
   "main": "src/index.js",
   "dependencies": {
     "lerp": "^1.0.3",
+    "postprocessing": "^6.17.3",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "react-postprocessing": "^1.4.0",
     "react-scripts": "3.4.3",
     "react-spring": "8.0.27",
     "react-three-fiber": "5.0.0",
