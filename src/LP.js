@@ -4,12 +4,20 @@ import { BackSide, DoubleSide, FrontSide, TextureLoader, Vector3 } from "three"
 import lerp from "lerp"
 
 const Vinyl = React.forwardRef((props, ref) => {
-  const [map] = useLoader(TextureLoader, ["/vinyl.jpg"])
+  const [map] = useLoader(TextureLoader, ["/vinyl.png"])
 
   return (
     <mesh {...props} ref={ref}>
       <circleBufferGeometry attach="geometry" args={[1.25, 32]} />
-      <meshBasicMaterial map={map} attach="material" side={DoubleSide} />
+      <meshPhongMaterial
+        specularMap={map}
+        specular="white"
+        bumpMap={map}
+        map={map}
+        attach="material"
+        bumpScale={0.001}
+        side={DoubleSide}
+      />
     </mesh>
   )
 })
@@ -93,7 +101,7 @@ export default function LP() {
           name="A"
           textureUrl="cover-front.jpg"
           materialProps={{
-            bumpScale: showVinyl ? 0 : 0.0025
+            bumpScale: showVinyl ? 0 : 0.0017
           }}
         />
         <Side
@@ -103,7 +111,7 @@ export default function LP() {
           position={[0, 0, -0.02]}
           rotation={[0, Math.PI, 0]}
           materialProps={{
-            bumpScale: showVinyl ? 0 : 0.0025
+            bumpScale: showVinyl ? 0 : 0.0017
           }}
         />
         <Vinyl
