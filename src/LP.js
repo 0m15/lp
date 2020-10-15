@@ -4,7 +4,7 @@ import { DoubleSide, TextureLoader, VideoTexture } from "three"
 import lerp from "lerp"
 import VideoMaterial from "./VideoMaterial"
 import Video from "./Video"
-import { Text } from "drei"
+import Text from "./Text"
 
 extend({ VideoMaterial })
 
@@ -137,7 +137,7 @@ export default function LP() {
         <Side
           onPointerDown={onClickSide(SIDE_B)}
           name="B"
-          textureUrl="cover-back.jpg"
+          textureUrl="cover-front-a.jpg"
           position={[0, 0, -0.02]}
           rotation={[0, Math.PI, 0]}
           materialProps={{

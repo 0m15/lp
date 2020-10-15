@@ -12,13 +12,15 @@ import {
 } from "@react-three/postprocessing"
 import Background from "./Background"
 import { BlendFunction } from "postprocessing"
-import { Text } from "drei"
+import { Html, Text, useProgress } from "drei"
 import Ui from "./Ui"
 import { useFrame, useThree } from "react-three-fiber"
+import Crystals from "./Crystals"
 
 export default function Scene() {
   const { size } = useThree()
   const mouse = useRef([0, 0])
+  const { active, progress, errors, item, loaded, total } = useProgress()
 
   useEffect(() => {
     const onMouseMove = (evt) => {
@@ -31,7 +33,7 @@ export default function Scene() {
     return () => {
       window.removeEventListener("mousemove", onMouseMove)
     }
-  }, [])
+  }, [size.width, size.height])
 
   return (
     <>
@@ -58,11 +60,16 @@ export default function Scene() {
           height={480}
         /> */}
         {/* <ChromaticAberration offset={[0.005, 0.001, 0.001]} /> */}
-        {/* <Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} /> */}
+        {/* <Bloom luminanceThreshold={0.4} luminanceSmoothing={0.9} height={300} /> */}
         {/* <Noise opacity={0.05} blendFunction={BlendFunction.OVERLAY} /> */}
-        <Vignette eskil={false} offset={0.25} darkness={0.25} />
+        <Vignette eskil={false} offset={0.25} darkness={0.65} />
         {/* <SSAO /> */}
       </EffectComposer>
+      {progress < 100 && (
+        <Html center>
+          <div style={{ color: "#fff" }}>{progress}%</div>
+        </Html>
+      )}
     </>
   )
 }
