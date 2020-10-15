@@ -8,6 +8,11 @@
   ],
   "main": "src/index.js",
   "dependencies": {
+    "@react-three/cannon": "^0.5.3",
+    "@react-three/drei": "^2.1.1-beta.3",
+    "@react-three/flex": "^0.5.2",
+    "@react-three/postprocessing": "^1.4.1",
+    "drei": "^1.5.7",
     "lerp": "^1.0.3",
     "postprocessing": "^6.17.3",
     "react": "16.13.1",
@@ -15,7 +20,7 @@
     "react-postprocessing": "^1.4.0",
     "react-scripts": "3.4.3",
     "react-spring": "8.0.27",
-    "react-three-fiber": "5.0.0",
+    "react-three-fiber": "^5.0.3",
     "three": "0.120.1"
   },
   "devDependencies": {},

@@ -1,26 +1,19 @@
-import React, {
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { extend, useFrame, useLoader } from "react-three-fiber"
-import {
-  AdditiveBlending,
-  BackSide,
-  DoubleSide,
-  FrontSide,
-  MultiplyBlending,
-  TextureLoader,
-  Vector3,
-  VideoTexture
-} from "three"
+import { DoubleSide, TextureLoader, VideoTexture } from "three"
 import lerp from "lerp"
 import VideoMaterial from "./VideoMaterial"
+import Video from "./Video"
+import { Text } from "drei"
 
 extend({ VideoMaterial })
+
+const SIDE_A = 0
+const SIDE_B = 1
+const SHOW_VINYL = 2
+const PLAYING = 3
+
+const DT = 0.075
 
 const Vinyl = React.forwardRef((props, ref) => {
   const [map, normalMap, bumpMap, specularMap] = useLoader(TextureLoader, [
@@ -32,7 +25,7 @@ const Vinyl = React.forwardRef((props, ref) => {
 
   return (
     <mesh {...props} ref={ref} castShadow receiveShadow>
-      <circleBufferGeometry attach="geometry" args={[1.25, 64]} />
+      <circleBufferGeometry attach="geometry" args={[0.45, 64]} />
       <meshPhongMaterial
         //specularMap={specularMap}
         normalMap={normalMap}
@@ -40,7 +33,7 @@ const Vinyl = React.forwardRef((props, ref) => {
         bumpMap={bumpMap}
         map={map}
         attach="material"
-        bumpScale={0.001}
+        bumpScale={0.0005}
         side={DoubleSide}
       />
     </mesh>
@@ -55,10 +48,10 @@ function Side({ textureUrl, materialProps, ...props }) {
 
   return (
     <mesh position={[0, 0, 0]} {...props} castShadow receiveShadow>
-      <planeBufferGeometry attach="geometry" args={[3, 3, 1]} />
+      <planeBufferGeometry attach="geometry" args={[1, 1, 1]} />
       <meshPhongMaterial
         specularMap={bumpMap}
-        specular="white"
+        specular="rgb(130, 130, 130)"
         bumpMap={bumpMap}
         map={map}
         attach="material"
@@ -68,124 +61,107 @@ function Side({ textureUrl, materialProps, ...props }) {
   )
 }
 
-function Video({ ...props }) {
-  const material = useRef()
-  const texture = useMemo(() => {
-    return new VideoTexture(document.getElementById("video"))
-  })
-
-  useFrame(({ clock }) => {
-    material.current.uniforms.time.value = clock.getElapsedTime() * 0.25
-  })
-
-  return (
-    <mesh position={[0, 0, 0]} {...props}>
-      <planeBufferGeometry attach="geometry" args={[3, 3, 1]} />
-      <videoMaterial
-        ref={material}
-        uniforms-tInput-value={texture}
-        attach="material"
-      />
-    </mesh>
-  )
-}
-
 export default function LP() {
   const group = useRef()
   const vinyl = useRef()
 
-  const [side, setSide] = useState("A")
-  const [showVinyl, setShowVynil] = useState(0)
+  const [lpState, setLpState] = useState(() => SIDE_A)
+  const [vinylState, setVinylState] = useState(0)
 
-  const onClick = useCallback(
+  const onClickSide = useCallback(
     (sideId) => (event) => {
-      console.log({ event: event })
-
-      if (side === sideId) {
+      if (lpState === sideId) {
         event.stopPropagation()
-        setSide(side === "A" ? "B" : "A")
+        setLpState(lpState === SIDE_A ? SIDE_B : SIDE_A)
       }
     },
-    [side]
+    [lpState]
   )
 
-  let rotation = 0
+  const onClickVinyl = useCallback(() => {
+    if (vinylState < SHOW_VINYL) {
+      return setVinylState(SHOW_VINYL)
+    } else if (vinylState < PLAYING) {
+      return setVinylState(PLAYING)
+    }
+
+    setVinylState(SIDE_A)
+  }, [vinylState])
 
   useFrame(({ clock }) => {
-    //group.current.rotation.set(0, clock.getElapsedTime(), 0)
-    if (side === "B" && group.current.rotation.y > -Math.PI) {
-      rotation = -Math.PI
+    if (!vinyl.current || !group.current) return
+
+    if (lpState === SIDE_B && group.current.rotation.y > -Math.PI) {
+      group.current.rotation.y = lerp(group.current.rotation.y, -Math.PI, DT)
     }
 
-    if (side === "A" && group.current.rotation.y > 0) {
-      rotation = 0
+    if (lpState === SIDE_A && group.current.rotation.y < 0) {
+      group.current.rotation.y = lerp(group.current.rotation.y, 0, DT)
     }
 
-    if (vinyl.current && showVinyl === 1 && vinyl.current.position.y < 2.5) {
-      group.current.position.y = lerp(group.current.position.y, -1.5, 0.05)
-      vinyl.current.position.y = lerp(vinyl.current.position.y, 2.5, 0.05)
+    if (vinylState === SHOW_VINYL && vinyl.current.position.y < 2.5) {
+      group.current.position.y = lerp(group.current.position.y, -0.25, DT)
+      vinyl.current.position.y = lerp(vinyl.current.position.y, 0.75, DT)
     }
 
-    if (showVinyl === 2) {
+    if (vinylState === PLAYING) {
       vinyl.current.rotation.z += 0.01
     }
 
-    if (vinyl.current && !showVinyl) {
-      group.current.position.y = lerp(group.current.position.y, 0, 0.05)
-      vinyl.current.position.y = lerp(vinyl.current.position.y, 0.5, 0.05)
+    if (vinylState !== SHOW_VINYL && vinylState !== PLAYING) {
+      group.current.position.y = lerp(group.current.position.y, 0, DT)
+      vinyl.current.position.y = lerp(vinyl.current.position.y, 0.1, DT)
     }
-
-    group.current.rotation.y = lerp(group.current.rotation.y, rotation, 0.05)
   })
 
   useEffect(() => {
     const video = document.getElementById("video")
     document.addEventListener("click", function () {
-      console.log("x")
-      if (showVinyl === 2) {
+      if (vinylState === SHOW_VINYL) {
         video.play()
       }
     })
-  }, [showVinyl])
+  }, [vinylState])
 
   return (
     <>
       <group ref={group}>
         <Side
-          onPointerDown={onClick("A")}
+          onPointerDown={onClickSide(SIDE_A)}
           name="A"
-          textureUrl="cover-front.jpg"
+          textureUrl="cover-front-a.jpg"
           materialProps={{
-            bumpScale: showVinyl ? 0 : 0.0017
+            bumpScale: 0.0015
           }}
         />
         <Side
-          onPointerDown={onClick("B")}
+          onPointerDown={onClickSide(SIDE_B)}
           name="B"
           textureUrl="cover-back.jpg"
           position={[0, 0, -0.02]}
           rotation={[0, Math.PI, 0]}
           materialProps={{
-            bumpScale: showVinyl ? 0 : 0.0017
+            bumpScale: 0.0015
           }}
         />
         <Vinyl
-          onPointerDown={() => {
-            if (!showVinyl) {
-              return setShowVynil(1)
-            }
-
-            if (showVinyl === 1) {
-              return setShowVynil(2)
-            }
-
-            setShowVynil(0)
-          }}
+          onPointerDown={onClickVinyl}
           ref={vinyl}
-          position={[0, 0.5, -0.01]}
+          position={[0, 0.1, -0.01]}
         />
-        {showVinyl === 2 && <Video position={[0, 0, 0.1]} />}
       </group>
+      {vinylState === PLAYING && (
+        <Video position={[0, -0.235, lpState === SIDE_A ? 0.001 : 0.02]} />
+      )}
+      <Text
+        position={[0, vinylState >= SHOW_VINYL ? -0.9 : -0.65, 0]}
+        color="#fff"
+        fontSize={0.05}>
+        {lpState === SIDE_A && "Side A)"}
+        {lpState === SIDE_B && "Side B)"}
+        {vinylState === SHOW_VINYL && " - Hit again to play"}
+        {vinylState > SHOW_VINYL && " - Hit again to stop"}
+      </Text>
     </>
   )
 }

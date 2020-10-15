@@ -45,10 +45,9 @@ export default class VideoMaterial extends ShaderMaterial {
 
         void main() {
             vec2 uv = vUv;
-            float mask = circle(uv, 1.0) + noise(time+uv*4.0);
+            float mask = circle(uv, 1.5) + noise(time+uv*4.0);
             gl_FragColor = vec4(mask);
             gl_FragColor = texture2D(tInput, uv) * mask;
-
         }
     `,
       uniforms: {
