@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef } from "react"
+import React, { Suspense, useEffect, useRef, useState } from "react"
 import LP from "./LP"
 import {
   EffectComposer,
@@ -18,6 +18,7 @@ import { useFrame, useThree } from "react-three-fiber"
 import Crystals from "./Crystals"
 import { Vector3 } from "three"
 import Text3d from "./Text3d"
+import MorphMesh from "./MorphMesh"
 
 const zoomIn = new Vector3(0, 0, 2)
 
@@ -27,8 +28,6 @@ function ZoomIn() {
   useFrame(({ camera, clock }) => {
     if (camera.position.z >= 2.1) {
       camera.position.lerp(zoomIn, 0.075)
-      console.log("lerp")
-      console.log(viewport.width)
     } else if (!resized.current) {
       resized.current = true
     }
@@ -37,9 +36,12 @@ function ZoomIn() {
   return null
 }
 
+const centerVec = new Vector3(0, 0, 0)
 export default function Scene() {
-  const { size, viewport } = useThree()
   const mouse = useRef([0, 0])
+  const [playingState, setPlayingState] = useState(0)
+  const [started, setStarted] = useState(false)
+  const { size, viewport } = useThree()
   const { active, progress, errors, item, loaded, total } = useProgress()
 
   useEffect(() => {
@@ -68,10 +70,19 @@ export default function Scene() {
         penumbra={1}
       /> */}
       <Suspense fallback={null}>
-        <ZoomIn />
-        <Background position={[0, 0, -1]} mouse={mouse.current} />
-        <LP />
-        {/* <Text3d position={[0, viewport.height - 2, -20]}>Text</Text3d> */}
+        {started && <ZoomIn />}
+        <Background
+          started={started}
+          playingState={playingState}
+          position={[0, 0, -1]}
+          mouse={mouse.current}
+        />
+        {/* <LP
+          ref={lp}
+          onPlay={() => void setPlayingState(1)}
+          onPause={() => void setPlayingState(0)}
+        /> */}
+        <MorphMesh />
       </Suspense>
 
       {/* <EffectComposer>
@@ -79,8 +90,11 @@ export default function Scene() {
         <Vignette eskil={false} offset={0.25} darkness={0.65} />
       </EffectComposer> */}
       <Html fullscreen>
-        {progress < 100 && <div style={{ color: "#fff" }}>{progress}%</div>}
-        <Ui />
+        <Ui
+          progress={progress}
+          started={started}
+          onStart={() => setStarted(true)}
+        />
       </Html>
     </>
   )

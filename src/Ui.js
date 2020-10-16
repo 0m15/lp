@@ -1,23 +1,61 @@
 import React, { useRef } from "react"
+import { a, useTransition, useSpring } from "@react-spring/web"
 import Text from "./Text"
-
-import { Flex, Box } from "@react-three/flex"
 import { useFrame, useThree } from "react-three-fiber"
 import lerp from "lerp"
 
-export default function Ui() {
+function Transition({ t, ...props }) {
+  return t((style, active) => {
+    return active && <a.div style={style} {...props} />
+  })
+}
+
+export default function Ui({ progress, onStart, started }) {
   const text1 = useRef()
 
+  const enter = useTransition(started, {
+    from: { opacity: 0, y: -10 },
+    enter: { opacity: 1, y: 0 }
+  })
+
+  const leave = useTransition(!started, {
+    from: { opacity: 1 },
+    leave: { opacity: 0 }
+  })
+
+  const leaveProgress = useTransition(progress < 100, {
+    from: { opacity: 1 },
+    leave: { opacity: 0 }
+  })
+
   return (
-    <div className="ui">
+    <div className="ui" onClick={started ? null : onStart}>
       <div className="top center">
-        <div className="fs1 ttu">&lt;band name&gt;</div>
-        <div className="fs2 ttu">&lt;album name&gt;</div>
+        <Transition t={enter} className="fs3 ttu">
+          band name
+        </Transition>
+        <Transition t={enter} className="fs4 ttu">
+          album name
+        </Transition>
+      </div>
+      {progress >= 100 && (
+        <div className="center middle">
+          <Transition t={leave} className="fs5 ttu ls5">
+            ~ tap to discover ~
+          </Transition>
+        </div>
+      )}
+      <div className="middle center" style={{ color: "#fff" }}>
+        <Transition t={leaveProgress}>{progress}%</Transition>
       </div>
       <div className="bottom center fs6 ttu ls3 a4">
         &copy; 2020 dna records
       </div>
-      <div className="bottom right fs3 ttu">share+</div>
+      {started && (
+        <Transition t={enter} className="bottom right fs4 ttu ls4">
+          share+
+        </Transition>
+      )}
     </div>
   )
   // return (

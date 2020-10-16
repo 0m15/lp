@@ -1,10 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react"
 import { extend, useFrame, useLoader } from "react-three-fiber"
 import { DoubleSide, TextureLoader, VideoTexture } from "three"
 import lerp from "lerp"
 import VideoMaterial from "./VideoMaterial"
 import Video from "./Video"
 import Text from "./Text"
+import { MeshDistortMaterial, MeshWobbleMaterial } from "drei"
 
 extend({ VideoMaterial })
 
@@ -24,7 +32,7 @@ const Vinyl = React.forwardRef((props, ref) => {
   ])
 
   return (
-    <mesh {...props} ref={ref} castShadow receiveShadow>
+    <mesh {...props} ref={ref}>
       <circleBufferGeometry attach="geometry" args={[0.4, 64]} />
       <meshPhongMaterial
         specularMap={specularMap}
@@ -49,15 +57,12 @@ function Side({ textureUrl, materialProps, ...props }) {
 
   return (
     <mesh position={[0, 0, 0]} {...props}>
-      <planeBufferGeometry attach="geometry" args={[0.8, 0.8, 0.8]} />
+      <boxBufferGeometry args={[0.8, 0.8, 0.01]} />
       <meshPhongMaterial
         specularMap={bumpMap}
-        // normalMap={normalMap}
-        // normalScale={[0.2, 0.2]}
-        specular="rgb(130, 130, 130)"
+        specular="lightpink"
         bumpMap={bumpMap}
         map={map}
-        attach="material"
         {...materialProps}
       />
 
@@ -71,107 +76,84 @@ function Side({ textureUrl, materialProps, ...props }) {
   )
 }
 
-export default function LP() {
-  const group = useRef()
-  const vinyl = useRef()
+const LP = forwardRef(
+  ({ onPlay = () => {}, onPause = () => {}, ...props } = {}, group) => {
+    const vinyl = useRef()
 
-  const [lpState, setLpState] = useState(() => SIDE_A)
-  const [vinylState, setVinylState] = useState(0)
+    const [lpState, setLpState] = useState(() => SIDE_A)
+    const [vinylState, setVinylState] = useState(0)
 
-  const onClickSide = useCallback(
-    (sideId) => (event) => {
-      if (lpState === sideId) {
+    const onClickSide = useCallback(
+      (sideId) => (event) => {
+        //if (lpState === sideId) {
         event.stopPropagation()
         setLpState(lpState === SIDE_A ? SIDE_B : SIDE_A)
+        //}
+      },
+      [lpState]
+    )
+
+    const onClickVinyl = useCallback(() => {
+      if (vinylState < SHOW_VINYL) {
+        return setVinylState(SHOW_VINYL)
+      } else if (vinylState < PLAYING) {
+        onPlay()
+        return setVinylState(PLAYING)
       }
-    },
-    [lpState]
-  )
 
-  const onClickVinyl = useCallback(() => {
-    if (vinylState < SHOW_VINYL) {
-      return setVinylState(SHOW_VINYL)
-    } else if (vinylState < PLAYING) {
-      return setVinylState(PLAYING)
-    }
+      onPause()
+      setVinylState(0)
+    }, [vinylState])
 
-    setVinylState(SIDE_A)
-  }, [vinylState])
+    useFrame(({ clock }) => {
+      if (!vinyl.current || !group.current) return
 
-  useFrame(({ clock }) => {
-    if (!vinyl.current || !group.current) return
+      if (lpState === SIDE_B && group.current.rotation.y > -Math.PI) {
+        group.current.rotation.y = lerp(group.current.rotation.y, -Math.PI, DT)
+      }
 
-    if (lpState === SIDE_B && group.current.rotation.y > -Math.PI) {
-      group.current.rotation.y = lerp(group.current.rotation.y, -Math.PI, DT)
-    }
+      if (lpState === SIDE_A && group.current.rotation.y < 0) {
+        group.current.rotation.y = lerp(group.current.rotation.y, 0, DT)
+      }
 
-    if (lpState === SIDE_A && group.current.rotation.y < 0) {
-      group.current.rotation.y = lerp(group.current.rotation.y, 0, DT)
-    }
+      if (vinylState === SHOW_VINYL && vinyl.current.position.y < 2.5) {
+        group.current.position.y = lerp(group.current.position.y, -0.25, DT)
+        vinyl.current.position.y = lerp(vinyl.current.position.y, 0.75, DT)
+      }
 
-    if (vinylState === SHOW_VINYL && vinyl.current.position.y < 2.5) {
-      group.current.position.y = lerp(group.current.position.y, -0.25, DT)
-      vinyl.current.position.y = lerp(vinyl.current.position.y, 0.75, DT)
-    }
+      if (vinylState === PLAYING) {
+        vinyl.current.rotation.z += 0.01
+      }
 
-    if (vinylState === PLAYING) {
-      vinyl.current.rotation.z += 0.01
-    }
-
-    if (vinylState !== SHOW_VINYL && vinylState !== PLAYING) {
-      group.current.position.y = lerp(group.current.position.y, 0, DT)
-      vinyl.current.position.y = lerp(vinyl.current.position.y, 0.1, DT)
-    }
-  })
-
-  useEffect(() => {
-    const video = document.getElementById("video")
-    document.addEventListener("click", function () {
-      if (vinylState === SHOW_VINYL) {
-        video.play()
+      if (vinylState !== SHOW_VINYL && vinylState !== PLAYING) {
+        group.current.position.y = lerp(group.current.position.y, 0, DT)
+        vinyl.current.position.y = lerp(vinyl.current.position.y, 0.1, DT)
       }
     })
-  }, [vinylState])
 
-  return (
-    <>
-      <group ref={group}>
-        <Vinyl
-          onPointerDown={onClickVinyl}
-          ref={vinyl}
-          position={[0, 0.1, -0.01]}
-        />
-        <Side
-          onPointerDown={onClickSide(SIDE_A)}
-          name="A"
-          textureUrl="cover-front-a.jpg"
-          materialProps={{
-            bumpScale: 0.0015
-          }}
-        />
-        <Side
-          onPointerDown={onClickSide(SIDE_B)}
-          name="B"
-          textureUrl="cover-front-a.jpg"
-          position={[0, 0, -0.02]}
-          rotation={[0, Math.PI, 0]}
-          materialProps={{
-            bumpScale: 0.0015
-          }}
-        />
-      </group>
-      {vinylState === PLAYING && (
+    return (
+      <>
+        <group ref={group}>
+          <Vinyl
+            onPointerDown={onClickVinyl}
+            ref={vinyl}
+            position={[0, 0.1, -0.01]}
+          />
+          <Side
+            onPointerDown={onClickSide(SIDE_A)}
+            name="A"
+            textureUrl="cover-front-a.jpg"
+            materialProps={{
+              bumpScale: 0.0015
+            }}
+          />
+        </group>
+        {/* {vinylState === PLAYING && (
         <Video position={[0, -0.235, lpState === SIDE_A ? 0.001 : 0.02]} />
-      )}
-      <Text
-        position={[0, vinylState >= SHOW_VINYL ? -0.75 : -0.5, 0]}
-        color="#fff"
-        fontSize={0.05}>
-        {lpState === SIDE_A && "Side A)"}
-        {lpState === SIDE_B && "Side B)"}
-        {vinylState === SHOW_VINYL && " - Hit again to play"}
-        {vinylState > SHOW_VINYL && " - Hit again to stop"}
-      </Text>
-    </>
-  )
-}
+      )} */}
+      </>
+    )
+  }
+)
+
+export default LP

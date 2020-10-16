@@ -8,6 +8,8 @@
   ],
   "main": "src/index.js",
   "dependencies": {
+    "@react-spring/three": "^9.0.0-rc.3",
+    "@react-spring/web": "^9.0.0-rc.3",
     "@react-three/cannon": "^0.5.3",
     "@react-three/drei": "^2.1.1-beta.3",
     "@react-three/flex": "^0.5.2",

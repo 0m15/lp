@@ -1,12 +1,15 @@
 import lerp from "lerp"
-import React, { useMemo, useRef } from "react"
+import React, { useEffect, useMemo, useRef } from "react"
 import { extend, useFrame, useLoader, useThree } from "react-three-fiber"
 import {
   MirroredRepeatWrapping,
   ShaderMaterial,
   TextureLoader,
-  UniformsLib
+  UniformsLib,
+  VideoTexture
 } from "three"
+
+const videoTexture = new VideoTexture(document.getElementById("video"))
 
 class BackgroundMaterial extends ShaderMaterial {
   constructor() {
@@ -24,6 +27,7 @@ class BackgroundMaterial extends ShaderMaterial {
         uniform vec2 mouse;
         uniform float time;
         uniform float alpha;
+        uniform float videoAlpha;
         uniform sampler2D map;
         uniform sampler2D map1;
         uniform sampler2D noise;
@@ -66,13 +70,15 @@ class BackgroundMaterial extends ShaderMaterial {
 
             vec3 distColor = vec3(r, g, b);
 
+            vec3 video = texture2D(map1, p).rgb;
+
             vec2 depth = mouse * 0.02 * pow(abs(p.x-0.5), 0.5);
             float warp = texture2D(noise, p+depth+time*0.02).r*0.05;
             vec4 bg = texture2D(map, p + depth+warp*c);
 
             // offset.x += mouse.x *0.01* abs(pow(p.x,0.75)); //length(uv - vec2(0.5));
             
-            gl_FragColor = vec4(mix(bg.rgb*1.2, distColor, c), 1.0) * alpha;
+            gl_FragColor = vec4(mix(bg.rgb*0.05, distColor, c), 1.0) * alpha;
           }
       `,
       uniforms: {
@@ -96,6 +102,9 @@ class BackgroundMaterial extends ShaderMaterial {
         },
         alpha: {
           value: 0
+        },
+        videoAlpha: {
+          value: 0
         }
       }
     })
@@ -104,11 +113,27 @@ class BackgroundMaterial extends ShaderMaterial {
 
 extend({ BackgroundMaterial })
 
-export default function Background({ mouse, ...props }) {
+export default function Background({ mouse, started, playingState, ...props }) {
   const [map, noise] = useLoader(TextureLoader, [
     "/cover-front-a.jpg",
     "/noise-a.jpg"
   ])
+
+  useEffect(() => {
+    const video = document.getElementById("video")
+    const onClick = () => {
+      if (playingState) {
+        video.play()
+      }
+    }
+
+    document.addEventListener("click", onClick)
+
+    return () => {
+      document.removeEventListener("click", onClick)
+    }
+  }, [playingState])
+
   const mesh = useRef()
   const mouseLerp = useRef([0, 0])
 
@@ -119,8 +144,8 @@ export default function Background({ mouse, ...props }) {
 
     map.wrapS = MirroredRepeatWrapping
     map.wrapT = MirroredRepeatWrapping
-    // map1.wrapS = MirroredRepeatWrapping
-    // map1.wrapT = MirroredRepeatWrapping
+    videoTexture.wrapS = MirroredRepeatWrapping
+    videoTexture.wrapT = MirroredRepeatWrapping
     noise.wrapS = MirroredRepeatWrapping
     noise.wrapT = MirroredRepeatWrapping
 
@@ -133,11 +158,12 @@ export default function Background({ mouse, ...props }) {
     ]
     mesh.current.material.uniforms.mouse.value = mouseLerp.current
     mesh.current.material.uniforms.map.value = map
-    // mesh.current.material.uniforms.map1.value = map1
+    mesh.current.material.uniforms.map1.value = videoTexture
 
     mesh.current.material.uniforms.noise.value = noise
     mesh.current.material.uniforms.time.value += 0.01
 
+    // if (!started) return
     mesh.current.material.uniforms.alpha.value = lerp(
       mesh.current.material.uniforms.alpha.value,
       1.0,
