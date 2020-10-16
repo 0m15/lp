@@ -78,7 +78,7 @@ class BackgroundMaterial extends ShaderMaterial {
 
             // offset.x += mouse.x *0.01* abs(pow(p.x,0.75)); //length(uv - vec2(0.5));
             
-            gl_FragColor = vec4(mix(bg.rgb*0.05, distColor, c), 1.0) * alpha;
+            gl_FragColor = vec4(mix(bg.rgb*0.1, distColor, c), 1.0) * alpha;
           }
       `,
       uniforms: {

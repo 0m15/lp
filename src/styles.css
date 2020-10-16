@@ -3,6 +3,16 @@
 }
 
 html,
+body {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+html,
 body,
 #root {
   width: 100%;
@@ -18,8 +28,8 @@ body {
 /* font */
 html,
 body {
-  font-family: "Times New Roman", Times, serif;
-  color: #fff;
+  font-family: Palatino, "Times New Roman", Times, serif;
+  color: #c9dfe3;
 }
 
 /* sizes */

@@ -11,7 +11,7 @@ import {
 } from "three"
 
 export const createMorphGeometry = () => {
-  var geometry = new BoxBufferGeometry(2, 2, 2, 8, 8, 8)
+  var geometry = new BoxBufferGeometry(1.5, 1.5, 1.5, 8, 8, 8)
 
   // create an empty array to hold targets for the attribute we want to morph
   // morphing positions and normals is supported
@@ -81,6 +81,7 @@ export default function MorphMesh() {
   useFrame(({ clock }) => {
     if (!mesh.current.morphTargetInfluences) mesh.current.updateMorphTargets()
     const t = clock.getElapsedTime()
+
     if (isHover && !isActive) {
       mesh.current.morphTargetInfluences[0] = lerp(
         mesh.current.morphTargetInfluences[0],
@@ -105,6 +106,9 @@ export default function MorphMesh() {
       mesh.current.scale.z = 1
       mesh.current.rotation.y += 0.01
     }
+
+    if (t < 2) return
+    mesh.current.material.opacity = lerp(mesh.current.material.opacity, 1, 0.01)
     //mesh.current.morphTargetInfluences[1] = (Math.sin(t) + 1) * 0.15
   })
 
@@ -130,6 +134,10 @@ export default function MorphMesh() {
         morphTargets
         map={map}
         bumpMap={bumpMap}
+        //specularMap={bumpMap}
+        //specular="#777"
+        transparent
+        opacity={0}
       />
     </mesh>
   )
