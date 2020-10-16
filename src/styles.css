@@ -14,3 +14,110 @@ body,
 body {
   background: #111;
 }
+
+/* font */
+html,
+body {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  color: #fff;
+}
+
+/* sizes */
+.fs1 {
+  font-size: 3rem;
+}
+
+.fs2 {
+  font-size: 2rem;
+}
+
+.fs3 {
+  font-size: 1.5rem;
+}
+
+.fs4 {
+  font-size: 1rem;
+}
+
+.fs5 {
+  font-size: 0.75rem;
+}
+
+.fs6 {
+  font-size: 0.5rem;
+}
+
+.ttu {
+  text-transform: uppercase;
+}
+
+.ls1 {
+  letter-spacing: 0.01em;
+}
+
+.ls2 {
+  letter-spacing: 0.025em;
+}
+
+.ls3 {
+  letter-spacing: 0.1em;
+}
+
+/* alphas */
+.a1 {
+  opacity: 0.1;
+}
+
+.a2 {
+  opacity: 0.25;
+}
+
+.a3 {
+  opacity: 0.5;
+}
+
+.a4 {
+  opacity: 0.75;
+}
+
+/* ui */
+.ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  user-select: none;
+}
+
+.ui > div {
+  position: absolute;
+  padding: 1rem;
+}
+
+.top {
+  top: 0;
+}
+
+.bottom {
+  bottom: 0;
+}
+
+.left {
+  left: 0;
+}
+
+.right {
+  right: 0;
+}
+
+.middle {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.center {
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}

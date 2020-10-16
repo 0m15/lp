@@ -23,7 +23,9 @@ class BackgroundMaterial extends ShaderMaterial {
         uniform vec2 resolution;
         uniform vec2 mouse;
         uniform float time;
+        uniform float alpha;
         uniform sampler2D map;
+        uniform sampler2D map1;
         uniform sampler2D noise;
         
         float hash(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }
@@ -64,12 +66,13 @@ class BackgroundMaterial extends ShaderMaterial {
 
             vec3 distColor = vec3(r, g, b);
 
-            float warp = texture2D(noise, p+time*0.02).r*0.05;
-            vec4 bg = texture2D(map, p+mouse*0.01+warp*c);
+            vec2 depth = mouse * 0.02 * pow(abs(p.x-0.5), 0.5);
+            float warp = texture2D(noise, p+depth+time*0.02).r*0.05;
+            vec4 bg = texture2D(map, p + depth+warp*c);
 
             // offset.x += mouse.x *0.01* abs(pow(p.x,0.75)); //length(uv - vec2(0.5));
             
-            gl_FragColor = vec4(mix(bg.rgb*0.5, distColor, c), 1.0);
+            gl_FragColor = vec4(mix(bg.rgb*1.2, distColor, c), 1.0) * alpha;
           }
       `,
       uniforms: {
@@ -87,6 +90,12 @@ class BackgroundMaterial extends ShaderMaterial {
         },
         map: {
           value: null
+        },
+        map1: {
+          value: null
+        },
+        alpha: {
+          value: 0
         }
       }
     })
@@ -105,25 +114,35 @@ export default function Background({ mouse, ...props }) {
 
   const { size } = useThree()
 
-  useFrame(() => {
+  useFrame(({ clock }) => {
     if (!mesh.current) return
 
     map.wrapS = MirroredRepeatWrapping
     map.wrapT = MirroredRepeatWrapping
+    // map1.wrapS = MirroredRepeatWrapping
+    // map1.wrapT = MirroredRepeatWrapping
     noise.wrapS = MirroredRepeatWrapping
     noise.wrapT = MirroredRepeatWrapping
 
     mouseLerp.current[0] = lerp(mouseLerp.current[0], mouse[0], 0.05)
     mouseLerp.current[1] = lerp(mouseLerp.current[1], mouse[1], 0.05)
 
-    mesh.current.material.uniforms.resolution.value = [size.width, size.height]
+    mesh.current.material.uniforms.resolution.value = [
+      size.width * window.devicePixelRatio,
+      size.height * window.devicePixelRatio
+    ]
     mesh.current.material.uniforms.mouse.value = mouseLerp.current
     mesh.current.material.uniforms.map.value = map
-
-    console.log(mouse)
+    // mesh.current.material.uniforms.map1.value = map1
 
     mesh.current.material.uniforms.noise.value = noise
     mesh.current.material.uniforms.time.value += 0.01
+
+    mesh.current.material.uniforms.alpha.value = lerp(
+      mesh.current.material.uniforms.alpha.value,
+      1.0,
+      0.01
+    )
   })
 
   return (

@@ -12,13 +12,33 @@ import {
 } from "@react-three/postprocessing"
 import Background from "./Background"
 import { BlendFunction } from "postprocessing"
-import { Html, Text, useProgress } from "drei"
+import { ContactShadows, Html, Shadow, Stars, Text, useProgress } from "drei"
 import Ui from "./Ui"
 import { useFrame, useThree } from "react-three-fiber"
 import Crystals from "./Crystals"
+import { Vector3 } from "three"
+import Text3d from "./Text3d"
+
+const zoomIn = new Vector3(0, 0, 2)
+
+function ZoomIn() {
+  const { viewport, invalidate, forceResize } = useThree()
+  const resized = useRef(false)
+  useFrame(({ camera, clock }) => {
+    if (camera.position.z >= 2.1) {
+      camera.position.lerp(zoomIn, 0.075)
+      console.log("lerp")
+      console.log(viewport.width)
+    } else if (!resized.current) {
+      resized.current = true
+    }
+  })
+
+  return null
+}
 
 export default function Scene() {
-  const { size } = useThree()
+  const { size, viewport } = useThree()
   const mouse = useRef([0, 0])
   const { active, progress, errors, item, loaded, total } = useProgress()
 
@@ -37,39 +57,31 @@ export default function Scene() {
 
   return (
     <>
-      <ambientLight intensity={0.6} />
+      <ambientLight intensity={0.9} />
       <pointLight position={[5, 1, 3]} intensity={1} />
+      {/* 
       <pointLight position={[-5, -1, 0]} intensity={1} />
       <spotLight
         intensity={0.63}
         position={[-30, 30, 10]}
         angle={0.2}
         penumbra={1}
-        castShadow
-      />
+      /> */}
       <Suspense fallback={null}>
-        <Background receiveShadow position={[0, 0, -1]} mouse={mouse.current} />
+        <ZoomIn />
+        <Background position={[0, 0, -1]} mouse={mouse.current} />
         <LP />
+        {/* <Text3d position={[0, viewport.height - 2, -20]}>Text</Text3d> */}
       </Suspense>
-      <Ui />
-      <EffectComposer>
-        {/* <DepthOfField
-          focusDistance={0}
-          focalLength={0.02}
-          bokehScale={2}
-          height={480}
-        /> */}
-        {/* <ChromaticAberration offset={[0.005, 0.001, 0.001]} /> */}
-        {/* <Bloom luminanceThreshold={0.4} luminanceSmoothing={0.9} height={300} /> */}
-        {/* <Noise opacity={0.05} blendFunction={BlendFunction.OVERLAY} /> */}
+
+      {/* <EffectComposer>
+        <ChromaticAberration offset={[0.001, 0.001, 0.001]} />
         <Vignette eskil={false} offset={0.25} darkness={0.65} />
-        {/* <SSAO /> */}
-      </EffectComposer>
-      {progress < 100 && (
-        <Html center>
-          <div style={{ color: "#fff" }}>{progress}%</div>
-        </Html>
-      )}
+      </EffectComposer> */}
+      <Html fullscreen>
+        {progress < 100 && <div style={{ color: "#fff" }}>{progress}%</div>}
+        <Ui />
+      </Html>
     </>
   )
 }

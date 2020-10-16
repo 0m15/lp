@@ -25,15 +25,15 @@ const Vinyl = React.forwardRef((props, ref) => {
 
   return (
     <mesh {...props} ref={ref} castShadow receiveShadow>
-      <circleBufferGeometry attach="geometry" args={[0.45, 64]} />
+      <circleBufferGeometry attach="geometry" args={[0.4, 64]} />
       <meshPhongMaterial
-        //specularMap={specularMap}
+        specularMap={specularMap}
         normalMap={normalMap}
-        specular="grey"
-        bumpMap={bumpMap}
+        // specular="rgba(90, 130, 150, 0.5)"
+        // bumpMap={bumpMap}
         map={map}
         attach="material"
-        bumpScale={0.0005}
+        bumpScale={0}
         side={DoubleSide}
       />
     </mesh>
@@ -41,22 +41,32 @@ const Vinyl = React.forwardRef((props, ref) => {
 })
 
 function Side({ textureUrl, materialProps, ...props }) {
-  const [map, bumpMap] = useLoader(TextureLoader, [
+  const [map, bumpMap, normalMap] = useLoader(TextureLoader, [
     "/" + textureUrl,
-    "/cover-bump.jpg"
+    "/cover-bump.jpg",
+    "/cover-front-a_NRM.png"
   ])
 
   return (
-    <mesh position={[0, 0, 0]} {...props} castShadow receiveShadow>
-      <planeBufferGeometry attach="geometry" args={[1, 1, 1]} />
+    <mesh position={[0, 0, 0]} {...props}>
+      <planeBufferGeometry attach="geometry" args={[0.8, 0.8, 0.8]} />
       <meshPhongMaterial
         specularMap={bumpMap}
+        // normalMap={normalMap}
+        // normalScale={[0.2, 0.2]}
         specular="rgb(130, 130, 130)"
         bumpMap={bumpMap}
         map={map}
         attach="material"
         {...materialProps}
       />
+
+      {/* <meshNormalMaterial
+        normalMap={bumpMap}
+        specular="rgb(130, 130, 130)"
+        bumpMap={bumpMap}
+        attach="material"
+      /> */}
     </mesh>
   )
 }
@@ -126,6 +136,11 @@ export default function LP() {
   return (
     <>
       <group ref={group}>
+        <Vinyl
+          onPointerDown={onClickVinyl}
+          ref={vinyl}
+          position={[0, 0.1, -0.01]}
+        />
         <Side
           onPointerDown={onClickSide(SIDE_A)}
           name="A"
@@ -144,17 +159,12 @@ export default function LP() {
             bumpScale: 0.0015
           }}
         />
-        <Vinyl
-          onPointerDown={onClickVinyl}
-          ref={vinyl}
-          position={[0, 0.1, -0.01]}
-        />
       </group>
       {vinylState === PLAYING && (
         <Video position={[0, -0.235, lpState === SIDE_A ? 0.001 : 0.02]} />
       )}
       <Text
-        position={[0, vinylState >= SHOW_VINYL ? -0.9 : -0.65, 0]}
+        position={[0, vinylState >= SHOW_VINYL ? -0.75 : -0.5, 0]}
         color="#fff"
         fontSize={0.05}>
         {lpState === SIDE_A && "Side A)"}
