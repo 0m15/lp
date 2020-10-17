@@ -61,8 +61,10 @@ export default function Ui({ progress, onStart, started }) {
       </div>
       <div className="middle center" style={{ width: 200 }}>
         <Transition prop={!isLoaded}>
+          <div className="bottom left fs6 ttu ls5">loading</div>
           <div
             style={{
+              marginTop: 2,
               width: progress + "%",
               height: 2,
               background: "currentColor"

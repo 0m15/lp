@@ -85,7 +85,7 @@ export default function MorphMesh() {
     if (isHover && !isActive) {
       mesh.current.morphTargetInfluences[0] = lerp(
         mesh.current.morphTargetInfluences[0],
-        1.2,
+        4,
         0.15
       )
       mesh.current.rotation.y += 0.005
@@ -100,7 +100,7 @@ export default function MorphMesh() {
     } else {
       mesh.current.morphTargetInfluences[0] = lerp(
         mesh.current.morphTargetInfluences[0],
-        Math.sin(t) + 3,
+        Math.sin(t) + 6,
         0.05
       )
       mesh.current.scale.z = 1
