@@ -172,7 +172,10 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
     const t = clock.getElapsedTime()
     if (materialShader) {
       materialShader.uniforms.time.value = t
-      materialShader.uniforms.mouse.value = mouse
+      materialShader.uniforms.mouse.value = [
+        lerp(materialShader.uniforms.mouse.value[0], mouse[0], 0.015),
+        lerp(materialShader.uniforms.mouse.value[1], mouse[1], 0.025)
+      ]
     }
 
     if (f.current % 10 === 0) n.current = Math.random() * 6 + 1
