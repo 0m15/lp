@@ -28,7 +28,7 @@ export default function Background({ mouse, started, playingState, ...props }) {
   const scale = useAspect("cover", 480, 480, 1)
 
   const [map, noise] = useLoader(TextureLoader, [
-    "/cover-front-a.jpg",
+    "/cover-front-a_NRM.png",
     "/noise-a.jpg"
   ])
 
@@ -43,7 +43,7 @@ export default function Background({ mouse, started, playingState, ...props }) {
     const video = document.getElementById("video")
 
     const onClick = () => {
-      if (playingState) {
+      if (!playingState) {
         video.play()
       } else {
         video.pause()
