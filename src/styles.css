@@ -10,6 +10,7 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  overflow: hidden;
 }
 
 html,
@@ -32,9 +33,14 @@ body {
   color: #c9dfe3;
 }
 
+/* positioning */
+.abs {
+  position: absolute;
+}
+
 /* sizes */
 .fs1 {
-  font-size: 3rem;
+  font-size: 5rem;
 }
 
 .fs2 {
@@ -59,6 +65,10 @@ body {
 
 .ttu {
   text-transform: uppercase;
+}
+
+.tc {
+  text-align: center;
 }
 
 .ls1 {
@@ -98,6 +108,34 @@ body {
   opacity: 0.75;
 }
 
+.oh {
+  overflow: hidden;
+}
+
+.h1 {
+  height: 60px;
+}
+
+.h2 {
+  height: 40px;
+}
+
+.h3 {
+  height: 30px;
+}
+
+.h4 {
+  height: 20px;
+}
+
+.h5 {
+  height: 15px;
+}
+
+.h6 {
+  height: 10px;
+}
+
 /* ui */
 .ui {
   position: absolute;
@@ -105,14 +143,20 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .ui > div {
-  position: absolute;
   padding: 1rem;
   width: fit-content;
   height: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .top {
@@ -132,12 +176,14 @@ body {
 }
 
 .middle {
-  top: 50%;
-  margin-top: -20px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .center {
-  left: 50%;
-  transform: translateX(-50%);
+  /* left: 50%; */
+  /* transform: translateX(-50%); */
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
 }

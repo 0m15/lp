@@ -146,6 +146,7 @@ export default {
   
       vec3 getForce(vec3 pCenter, float radius) {
         vec3 forceFieldPosition = uForcePosition;
+        forceFieldPosition.y *= -1.0;
         forceFieldPosition.z = 0.5;
         float distanceToParticle = distance(pCenter, forceFieldPosition);
         float forceFieldRadius = abs(radius);
@@ -160,29 +161,48 @@ export default {
   
       void main() {
         vec2 p = vUv;
-        vec4 pos = texture2D( positions, vUv );
         vec4 orig = texture2D( initial, vUv );
-        vec4 old = texture2D( oldPositions , vUv );
+        vec4 pos = texture2D( positions, vUv );
+        //vec4 old = texture2D( oldPositions , vUv );
   
         // force
-        vec3 force = getForce(pos.xyz, 0.8)*0.005;
-        pos.xyz += force;
-  
-        // curl noise
-        vec3 warp = curl(pos.x*1., pos.y*1., pos.z*1.)*0.0005;
-        pos.xyz += warp;
+        vec3 force = getForce(pos.xyz, .15)*0.05;
+        //pos.xyz += force;
         
-        pos.y -= 0.00005;
+       
+        // strange attractor
+        float timestep = 0.005;
+        float x = pos.x;
+        float y = pos.y;
+        float z = pos.z;
+        float dx = 0.0; float dy = 0.0; float dz = 0.0;
+        
+        // attractor parameters
+        float a = -5.5;
+        float b = 3.5;
+        float d = -1.;
+                
+        dx = y * timestep;
+        dy = z * timestep;
+        dz = (-a*x -b*y -z + (d* (pow(x, 3.)))) * timestep;
+        
+        // Add the new increments to the previous position
+        vec3 attractorForce = vec3(dx, dy, dz) ;
+        //pos.xyz += attractorForce;
 
-        // fade out
-        //pos.a *= 0.998;
-  
+        // curl noise
+        vec3 warp = curl(pos.x*4., pos.y*4., pos.z*4.)*0.0025;
+        //pos.xyz += warp;
+        pos.z += 0.001;
+
         // random reset particle
-        if (hash(p+time) > 0.996) {
+        if (hash(p+time) > 0.997) {
           pos = orig;
         }
-  
-        gl_FragColor = pos;
+        
+        //float d = length(p);
+        //gl_FragColor = vec4(vec3(mix(pos.xyz, orig.xyz, d*d)),1.0);
+        gl_FragColor = vec4(vec3(pos.xyz),1.0);
       }
     `
 }

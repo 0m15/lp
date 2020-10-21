@@ -1,18 +1,11 @@
-import React, {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react"
-import { extend, useFrame, useLoader } from "react-three-fiber"
+import React, { forwardRef, useCallback, useRef, useState } from "react"
+import { extend, useFrame, useLoader, useThree } from "react-three-fiber"
 import { DoubleSide, TextureLoader, VideoTexture } from "three"
 import lerp from "lerp"
 import VideoMaterial from "./VideoMaterial"
-import Video from "./Video"
-import Text from "./Text"
-import { MeshDistortMaterial, MeshWobbleMaterial } from "drei"
+import MorphMesh from "./MorphMesh"
+import { useDrag } from "react-use-gesture"
+import { useSpring, a } from "@react-spring/three"
 
 extend({ VideoMaterial })
 
@@ -32,8 +25,8 @@ const Vinyl = React.forwardRef((props, ref) => {
   ])
 
   return (
-    <mesh {...props} ref={ref}>
-      <circleBufferGeometry attach="geometry" args={[0.4, 64]} />
+    <a.mesh {...props} ref={ref}>
+      <circleBufferGeometry attach="geometry" args={[0.7, 64]} />
       <meshPhongMaterial
         specularMap={specularMap}
         normalMap={normalMap}
@@ -42,53 +35,97 @@ const Vinyl = React.forwardRef((props, ref) => {
         map={map}
         attach="material"
         bumpScale={0}
+        transparent
         side={DoubleSide}
       />
-    </mesh>
+    </a.mesh>
   )
 })
 
-function Side({ textureUrl, materialProps, ...props }) {
-  const [map, bumpMap, normalMap] = useLoader(TextureLoader, [
-    "/" + textureUrl,
-    "/cover-bump.jpg",
-    "/cover-front-a_NRM.png"
-  ])
-
-  return (
-    <mesh position={[0, 0, 0]} {...props}>
-      <boxBufferGeometry args={[0.8, 0.8, 0.01]} />
-      <meshPhongMaterial
-        specularMap={bumpMap}
-        specular="lightpink"
-        bumpMap={bumpMap}
-        map={map}
-        {...materialProps}
-      />
-
-      {/* <meshNormalMaterial
-        normalMap={bumpMap}
-        specular="rgb(130, 130, 130)"
-        bumpMap={bumpMap}
-        attach="material"
-      /> */}
-    </mesh>
-  )
-}
-
 const LP = forwardRef(
-  ({ onPlay = () => {}, onPause = () => {}, ...props } = {}, group) => {
+  (
+    { started, onPlay = () => {}, onPause = () => {}, ...props } = {},
+    group
+  ) => {
     const vinyl = useRef()
 
     const [lpState, setLpState] = useState(() => SIDE_A)
     const [vinylState, setVinylState] = useState(0)
 
+    const [rotate, setRotation] = useSpring(() => ({
+      y: 1,
+      from: {
+        y: 0
+      },
+      reset: true
+    }))
+
+    const [offset, setOffset] = useSpring(() => ({
+      y: 0,
+      from: {
+        y: 0.5
+      },
+      reset: true
+    }))
+
+    const lastRotation = useRef(0)
+    const lastOffset = useRef(0)
+
+    useDrag(
+      ({
+        down,
+        movement: [mx, my],
+        direction: [xDir, yDir],
+        axis,
+        velocity
+      }) => {
+        const trigger = velocity > 0.4
+        let dy = (my / window.innerHeight) * 2
+        let dx = (mx / window.innerWidth) * 2
+
+        const rotateY = xDir > 0 ? 1 : 0
+        const offsetY = yDir > 0 ? 0 : 0.5
+
+        if (axis === "y") {
+          console.log("y.axis")
+          if (!down && trigger) {
+            offsetY ? onPlay() : onPause()
+            setOffset({ y: offsetY })
+            lastOffset.current = offsetY
+          } else if (!down) {
+            setOffset({ y: lastOffset.current })
+          } else {
+            setOffset({ y: lastOffset.current - dy })
+          }
+          return
+        }
+
+        if (!down && trigger) {
+          setRotation({ y: rotateY })
+          lastRotation.current = rotateY
+        } else if (!down) {
+          setRotation({ y: lastRotation.current })
+        } else {
+          if (
+            (lastRotation.current === 0 && !xDir) ||
+            (lastRotation.current > 0 && xDir)
+          ) {
+            // d *= 0.2
+          }
+
+          setRotation({ y: lastRotation.current + dx })
+        }
+      },
+      {
+        lockDirection: true,
+        domTarget: window
+      }
+    )
+
     const onClickSide = useCallback(
-      (sideId) => (event) => {
-        //if (lpState === sideId) {
+      (event) => {
         event.stopPropagation()
         setLpState(lpState === SIDE_A ? SIDE_B : SIDE_A)
-        //}
       },
       [lpState]
     )
@@ -105,53 +142,16 @@ const LP = forwardRef(
       setVinylState(0)
     }, [vinylState])
 
-    useFrame(({ clock }) => {
-      if (!vinyl.current || !group.current) return
-
-      if (lpState === SIDE_B && group.current.rotation.y > -Math.PI) {
-        group.current.rotation.y = lerp(group.current.rotation.y, -Math.PI, DT)
-      }
-
-      if (lpState === SIDE_A && group.current.rotation.y < 0) {
-        group.current.rotation.y = lerp(group.current.rotation.y, 0, DT)
-      }
-
-      if (vinylState === SHOW_VINYL && vinyl.current.position.y < 2.5) {
-        group.current.position.y = lerp(group.current.position.y, -0.25, DT)
-        vinyl.current.position.y = lerp(vinyl.current.position.y, 0.75, DT)
-      }
-
-      if (vinylState === PLAYING) {
-        vinyl.current.rotation.z += 0.01
-      }
-
-      if (vinylState !== SHOW_VINYL && vinylState !== PLAYING) {
-        group.current.position.y = lerp(group.current.position.y, 0, DT)
-        vinyl.current.position.y = lerp(vinyl.current.position.y, 0.1, DT)
-      }
-    })
-
     return (
-      <>
-        <group ref={group}>
-          <Vinyl
-            onPointerDown={onClickVinyl}
-            ref={vinyl}
-            position={[0, 0.1, -0.01]}
-          />
-          <Side
-            onPointerDown={onClickSide(SIDE_A)}
-            name="A"
-            textureUrl="cover-front-a.jpg"
-            materialProps={{
-              bumpScale: 0.0015
-            }}
-          />
-        </group>
-        {/* {vinylState === PLAYING && (
-        <Video position={[0, -0.235, lpState === SIDE_A ? 0.001 : 0.02]} />
-      )} */}
-      </>
+      <a.group
+        ref={group}
+        {...props}
+        position-y={offset.y.to((d) => d * -3)}
+        //rotation-x={offset.y.to((d) => d * 0.5)}
+        rotation-y={rotate.y.to((d) => d * Math.PI)}>
+        <Vinyl position-y={offset.y.to((d) => d * Math.PI)} ref={vinyl} />
+        <MorphMesh started={started} />
+      </a.group>
     )
   }
 )

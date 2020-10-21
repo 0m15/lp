@@ -8,27 +8,30 @@ import { Vector3 } from "three"
 import Text3d from "./Text3d"
 import MorphMesh from "./MorphMesh"
 import FboParticles from "./Particles"
+import LP from "./LP"
+import Swarm from "./Swarm"
+import lerp from "lerp"
 
-const zoomIn = new Vector3(0, 0, 2)
+const zoomIn = new Vector3(0, 0, 3)
+const zoomIn2 = new Vector3(0, 0, 1)
 
-function ZoomIn() {
-  const { viewport, invalidate, forceResize } = useThree()
-  const resized = useRef(false)
-  useFrame(({ camera, clock }) => {
-    if (camera.position.z >= 2.1) {
-      camera.position.lerp(zoomIn, 0.025)
-    } else if (!resized.current) {
-      resized.current = true
-    }
+function ZoomIn({ to = zoomIn } = {}) {
+  useFrame(({ camera }) => {
+    camera.position.lerp(to, 0.05)
   })
 
   return null
 }
 
+function Grid({ ...props }) {
+  return <gridHelper args={[22, 20]} position={[0, -1, -10]} />
+}
+
 const centerVec = new Vector3(0, 0, 0)
 export default function Scene() {
   const mouse = useRef([0, 0])
-  const [playingState, setPlayingState] = useState(0)
+  const lp = useRef()
+  const [playingState, setPlayingState] = useState(false)
   const [started, setStarted] = useState(false)
   const { size, viewport } = useThree()
   const { active, progress, errors, item, loaded, total } = useProgress()
@@ -59,20 +62,35 @@ export default function Scene() {
         penumbra={1}
       /> */}
       <Suspense fallback={null}>
-        {started && <ZoomIn />}
         <Background
           started={started}
           playingState={playingState}
-          position={[0, 0, -1]}
+          position={[0, 4, -20]}
           mouse={mouse.current}
         />
-        <MorphMesh />
+        <LP
+          started={started}
+          ref={lp}
+          position={[0, 0, -3]}
+          onPlay={() => {
+            setPlayingState(true)
+          }}
+          onPause={() => {
+            setPlayingState(false)
+          }}
+        />
+        {started && <Swarm mouse={mouse} />}
       </Suspense>
-      <FboParticles />
+      <Grid />
+      {started && !playingState && <ZoomIn />}
+      {playingState && <ZoomIn to={zoomIn2} />}
+      {/* <Crystals /> */}
+      {/* <FboParticles /> */}
       <Html fullscreen>
         <Ui
           progress={progress}
           started={started}
+          playingState={playingState}
           onStart={() => setStarted(true)}
         />
       </Html>

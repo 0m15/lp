@@ -10,13 +10,13 @@ import {
   OrthographicCamera,
   BufferGeometry,
   BufferAttribute,
-  Mesh
+  Mesh,
+  RGBFormat
 } from "three"
 
 export default function useFbo({
-  width = 512,
-  height = 512,
-  uniforms,
+  width,
+  height,
   name = "FBO",
   data,
   simulationShader,
@@ -56,9 +56,9 @@ export default function useFbo({
   }, [width, height, props])
 
   const positions = useMemo(() => {
-    const t = new DataTexture(data, width, height, RGBAFormat, FloatType)
-    t.needsUpdate = true
-    return t
+    const temp = new DataTexture(data, width, height, RGBFormat, FloatType)
+    temp.needsUpdate = true
+    return temp
   }, [width, height, data])
 
   const simulationMaterial = useMemo(() => {
@@ -103,6 +103,7 @@ export default function useFbo({
   }, [])
 
   let index = useRef(0)
+  let copy = useRef(1)
 
   const update = useCallback(
     ({ renderer, time }) => {
@@ -111,15 +112,20 @@ export default function useFbo({
       const prevTarget = renderTarget[idx]
       const currentTarget = renderTarget[currentTargetIndex]
 
+      if (copy.current) {
+        simulationMaterial.uniforms.initial.value = positions
+      }
+
       simulationMaterial.uniforms.positions.value = prevTarget.texture
       simulationMaterial.uniforms.time.value = time
 
       renderer.setRenderTarget(currentTarget)
       renderer.render(scene, camera)
 
-      simulationMaterial.uniforms.oldPositions.value = currentTarget.texture
+      //simulationMaterial.uniforms.oldPositions.value = currentTarget.texture
 
       index.current = currentTargetIndex
+      copy.current = false
     },
     [renderTarget, scene, camera, simulationMaterial]
   )

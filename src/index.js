@@ -9,6 +9,7 @@ import "./styles.css"
 function App() {
   const gpu = useDetectGPU()
   console.log({ gpu })
+
   return (
     <Canvas
       pixelRatio={
@@ -18,6 +19,7 @@ function App() {
       }
       colorManagement
       concurrent
+      //orthographic
       gl={{
         powerPreference: "high-performance",
         alpha: false,

@@ -64,8 +64,8 @@ export default function Crystals({ count = 10, ...props }) {
 
   return (
     <mesh ref={mesh} layers={1} {...props}>
-      {/* <dodecahedronBufferGeometry attach="geometry" args={[1.5]} /> */}
-      <sphereBufferGeometry attach="geometry" args={[0.6, 32, 32]} />
+      <dodecahedronBufferGeometry attach="geometry" args={[0.5]} />
+      {/* <sphereBufferGeometry attach="geometry" args={[0.6, 32, 32]} /> */}
       {/* <coneBufferGeometry attach="geometry" args={[1.25, 2, 4]} /> */}
     </mesh>
   )
