@@ -214,7 +214,7 @@ export default function MorphMesh({ started, onPointerDown, ...props }) {
         morphTargets
         map={map}
         normalMap={normalMap}
-        normalScale={[0.1, 0.1]}
+        normalScale={[0.2, 0.2]}
         //specularMap={bumpMap}
         //specular="white"
         transparent

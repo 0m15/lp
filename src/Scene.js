@@ -72,6 +72,7 @@ export default function Scene() {
         />
         <LP
           started={started}
+          playingState={playingState}
           ref={lp}
           position={[0, 0, -3]}
           onPlay={() => {

@@ -21,7 +21,7 @@ export default function Swarm({ count = 25, mouse }) {
       const speed = 0.01 + Math.random() / 200
       const xFactor = -20 + Math.random() * 40
       const yFactor = -20 + Math.random() * 40
-      const zFactor = -20 + Math.random() * 40
+      const zFactor = -40 + Math.random() * 20
       temp.push({ t, factor, speed, xFactor, yFactor, zFactor, mx: 0, my: 0 })
     }
     return temp
@@ -60,13 +60,14 @@ export default function Swarm({ count = 25, mouse }) {
     <>
       <instancedMesh ref={mesh} args={[null, null, count]}>
         <boxBufferGeometry attach="geometry" args={[2, 2, 2]} />
-        <meshPhongMaterial
-          map={map}
-          normalMap={map}
+        <meshNormalMaterial
           bumpMap={map}
-          specular="lightgreen"
-          attach="material"
-          color="orange"
+          //normalMap={map}
+          bumpScale={1}
+          //   bumpMap={map}
+          //   specular="pink"
+          //   attach="material"
+          color="rgba(250, 190, 0, 0.5)"
         />
       </instancedMesh>
     </>

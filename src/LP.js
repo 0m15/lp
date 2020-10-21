@@ -17,26 +17,24 @@ const PLAYING = 3
 const DT = 0.075
 
 const Vinyl = React.forwardRef((props, ref) => {
-  const [map, normalMap, bumpMap, specularMap] = useLoader(TextureLoader, [
+  const [map, bump, normal] = useLoader(TextureLoader, [
     "/vinyl-a.png",
-    "/vinyl-a-normal.png",
-    "/vinyl-a-bump.png",
-    "/vinyl-a-spec.png"
+    "/cover-front-a_NRM.png",
+    "/vinyl-a-normal.png"
   ])
 
   return (
     <a.mesh {...props} ref={ref}>
       <circleBufferGeometry attach="geometry" args={[0.7, 64]} />
       <meshPhongMaterial
-        specularMap={specularMap}
-        normalMap={normalMap}
-        // specular="rgba(90, 130, 150, 0.5)"
-        // bumpMap={bumpMap}
         map={map}
+        bumpMap={bump}
+        normalMap={normal}
+        bumpScale={1}
         attach="material"
-        bumpScale={0}
-        transparent
+        //color="rgba(250, 190, 0, 0.5)"
         side={DoubleSide}
+        transparent
       />
     </a.mesh>
   )
@@ -44,13 +42,16 @@ const Vinyl = React.forwardRef((props, ref) => {
 
 const LP = forwardRef(
   (
-    { started, onPlay = () => {}, onPause = () => {}, ...props } = {},
+    {
+      playingState,
+      started,
+      onPlay = () => {},
+      onPause = () => {},
+      ...props
+    } = {},
     group
   ) => {
     const vinyl = useRef()
-
-    const [lpState, setLpState] = useState(() => SIDE_A)
-    const [vinylState, setVinylState] = useState(0)
 
     const [rotate, setRotation] = useSpring(() => ({
       y: 1,
@@ -122,31 +123,18 @@ const LP = forwardRef(
       }
     )
 
-    const onClickSide = useCallback(
-      (event) => {
-        event.stopPropagation()
-        setLpState(lpState === SIDE_A ? SIDE_B : SIDE_A)
-      },
-      [lpState]
-    )
-
-    const onClickVinyl = useCallback(() => {
-      if (vinylState < SHOW_VINYL) {
-        return setVinylState(SHOW_VINYL)
-      } else if (vinylState < PLAYING) {
-        onPlay()
-        return setVinylState(PLAYING)
+    useFrame(() => {
+      if (playingState) {
+        vinyl.current.rotation.z -= 0.01
       }
-
-      onPause()
-      setVinylState(0)
-    }, [vinylState])
+    })
 
     return (
       <a.group
         ref={group}
         {...props}
-        position-y={offset.y.to((d) => d * -3)}
+        position-y={offset.y.to((d) => d * -5)}
+        position-z={rotate.y.to((d) => d * 0.01)}
         //rotation-x={offset.y.to((d) => d * 0.5)}
         rotation-y={rotate.y.to((d) => d * Math.PI)}>
         <Vinyl position-y={offset.y.to((d) => d * Math.PI)} ref={vinyl} />
