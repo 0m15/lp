@@ -25,7 +25,7 @@ function ZoomIn({ to = zoomIn } = {}) {
 
 function Grid({ ...props }) {
   return (
-    <gridHelper args={[22, 20, 0x000000, 0x111111]} position={[0, -1, -10]} />
+    <gridHelper args={[22, 20, 0x111111, 0x111111]} position={[0, -1, -10]} />
   )
 }
 
@@ -74,6 +74,7 @@ export default function Scene() {
           started={started}
           playingState={playingState}
           ref={lp}
+          mouse={mouse.current}
           position={[0, 0, -3]}
           onPlay={() => {
             setPlayingState(true)

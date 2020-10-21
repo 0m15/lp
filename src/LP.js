@@ -43,6 +43,7 @@ const Vinyl = React.forwardRef((props, ref) => {
 const LP = forwardRef(
   (
     {
+      mouse,
       playingState,
       started,
       onPlay = () => {},
@@ -138,7 +139,7 @@ const LP = forwardRef(
         //rotation-x={offset.y.to((d) => d * 0.5)}
         rotation-y={rotate.y.to((d) => d * Math.PI)}>
         <Vinyl position-y={offset.y.to((d) => d * Math.PI)} ref={vinyl} />
-        <MorphMesh started={started} />
+        <MorphMesh mouse={mouse} started={started} />
       </a.group>
     )
   }

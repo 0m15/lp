@@ -21,6 +21,7 @@ export const mat = new MeshPhongMaterial()
 export let materialShader = null
 
 mat.onBeforeCompile = (shader) => {
+  shader.uniforms.mouse = { value: [0, 0] }
   shader.uniforms.time = { value: 0 }
   shader.vertexShader = `
     uniform float time;
@@ -61,6 +62,28 @@ mat.onBeforeCompile = (shader) => {
       `
   )
 
+  shader.fragmentShader = `
+    uniform float time;
+    uniform vec2 mouse;
+
+    ${snoise}
+    ${shader.fragmentShader}
+  `
+
+  shader.fragmentShader = shader.fragmentShader.replace(
+    "#include <dithering_fragment>",
+    `
+    #include <dithering_fragment>
+    
+    vec3 color = texture2D(map, vUv).rgb;
+    float d = (gl_FragColor.g+gl_FragColor.r+gl_FragColor.b)/3.0;
+    vec2 offset = vec2(mouse.x * d, mouse.y * d) * 0.05;
+    vec3 outColor = texture2D(map, vUv + offset).rgb;
+    
+    gl_FragColor = vec4(mix(outColor.rgb, normal.rgb, d*d), gl_FragColor.a);
+    //gl_FragColor = vec4(outColor.rgb, gl_FragColor.a);
+    `
+  )
   materialShader = shader
 }
 
@@ -109,21 +132,25 @@ export const createMorphGeometry = () => {
   }
 
   // add the spherical positions as the first morph target
-  geometry.morphAttributes.position[0] = new Float32BufferAttribute(
-    spherePositions,
-    3
-  )
+  // geometry.morphAttributes.position[0] = new Float32BufferAttribute(
+  //   spherePositions,
+  //   3
+  // )
 
-  // add the twisted positions as the second morph target
-  geometry.morphAttributes.position[1] = new Float32BufferAttribute(
-    twistPositions,
-    3
-  )
+  // // add the twisted positions as the second morph target
+  // geometry.morphAttributes.position[1] = new Float32BufferAttribute(
+  //   twistPositions,
+  //   3
+  // )
+
+  // // Hack required to get Mesh to have morphTargetInfluences attribute
+  // geometry.morphTargets = []
+  // geometry.morphTargets.push(0)
 
   return geometry
 }
 
-export default function MorphMesh({ started, onPointerDown, ...props }) {
+export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
   const mesh = useRef()
   const geometry = useMemo(() => createMorphGeometry(), [])
   const [isActive, setActive] = useState(false)
@@ -143,24 +170,27 @@ export default function MorphMesh({ started, onPointerDown, ...props }) {
     if (!mesh.current.morphTargetInfluences) mesh.current.updateMorphTargets()
 
     const t = clock.getElapsedTime()
-    if (materialShader) materialShader.uniforms.time.value = t
+    if (materialShader) {
+      materialShader.uniforms.time.value = t
+      materialShader.uniforms.mouse.value = mouse
+    }
 
     if (f.current % 10 === 0) n.current = Math.random() * 6 + 1
 
     if (isHover && !started) {
-      mesh.current.morphTargetInfluences[0] = lerp(
-        mesh.current.morphTargetInfluences[0],
-        n.current,
-        0.5
-      )
+      // mesh.current.morphTargetInfluences[0] = lerp(
+      //   mesh.current.morphTargetInfluences[0],
+      //   n.current,
+      //   0.5
+      // )
       mesh.current.rotation.y += 0.005
       //mesh.current.material.wireframe = true
     } else if (started) {
-      mesh.current.morphTargetInfluences[0] = lerp(
-        mesh.current.morphTargetInfluences[0],
-        0,
-        0.1
-      )
+      // mesh.current.morphTargetInfluences[0] = lerp(
+      //   mesh.current.morphTargetInfluences[0],
+      //   0,
+      //   0.1
+      // )
       mesh.current.scale.z = lerp(mesh.current.scale.z, 0.01, 0.05)
       mesh.current.rotation.y = lerp(mesh.current.rotation.y, -Math.PI, 0.05)
       // mesh.current.material.wireframe = false
@@ -171,7 +201,7 @@ export default function MorphMesh({ started, onPointerDown, ...props }) {
       //   0.25
       // )
 
-      mesh.current.morphTargetInfluences[0] = 4
+      //mesh.current.morphTargetInfluences[0] = 4
       mesh.current.scale.x = 1 // + Math.sin(t * 0.5) * 0.25
       mesh.current.scale.y = 1 // + Math.sin(t * 0.5) * 0.25
       mesh.current.scale.z = 1 // + Math.sin(t * 0.5) * 0.25
