@@ -24,7 +24,9 @@ function ZoomIn({ to = zoomIn } = {}) {
 }
 
 function Grid({ ...props }) {
-  return <gridHelper args={[22, 20]} position={[0, -1, -10]} />
+  return (
+    <gridHelper args={[22, 20, 0x000000, 0x111111]} position={[0, -1, -10]} />
+  )
 }
 
 const centerVec = new Vector3(0, 0, 0)

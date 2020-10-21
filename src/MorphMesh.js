@@ -219,6 +219,7 @@ export default function MorphMesh({ started, onPointerDown, ...props }) {
         //specular="white"
         transparent
         opacity={0}
+        color="lightpink"
         wireframe={!started}
       />
       {/* <customMaterial attach="material" map={map} morphTargets /> */}

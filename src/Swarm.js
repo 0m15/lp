@@ -66,7 +66,7 @@ export default function Swarm({ count = 25, mouse }) {
           bumpMap={map}
           specular="lightgreen"
           attach="material"
-          color="lightpink"
+          color="orange"
         />
       </instancedMesh>
     </>
