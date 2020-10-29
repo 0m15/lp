@@ -30,7 +30,7 @@ body {
 /* font */
 html,
 body {
-  font-family: Palatino, "Times New Roman", Times, serif;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   color: #c9dfe3;
 }
 
@@ -135,6 +135,11 @@ body {
 
 .h6 {
   height: 10px;
+}
+
+.icon1 {
+  font-size: 3rem;
+  line-height: 0.75;
 }
 
 /* ui */

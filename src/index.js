@@ -12,20 +12,13 @@ function App() {
 
   return (
     <Canvas
-      pixelRatio={
-        gpu.isMobile
-          ? Math.min(2, window.devicePixelRatio)
-          : Math.min(2, window.devicePixelRatio)
-      }
+      pixelRatio={Math.min(2, window.devicePixelRatio)}
       colorManagement
       concurrent
       //orthographic
       gl={{
         powerPreference: "high-performance",
-        alpha: false,
-        antialias: false,
-        stencil: false,
-        depth: false
+        antialias: false
       }}
       onCreated={({ gl }) => {
         gl.toneMapping = ACESFilmicToneMapping
@@ -33,7 +26,7 @@ function App() {
       }}
       camera={{
         fov: 50,
-        position: [0, 0, 5]
+        position: [0, 0, 4]
       }}>
       <Scene />
     </Canvas>

@@ -11,9 +11,16 @@ import FboParticles from "./Particles"
 import LP from "./LP"
 import Swarm from "./Swarm"
 import lerp from "lerp"
+import useAccelerometer from "./MotionSensor"
 
-const zoomIn = new Vector3(0, 0, 3)
-const zoomIn2 = new Vector3(0, 0, 1)
+const zoomIn = new Vector3(0, 0, 5)
+const zoomIn2 = new Vector3(0, 0, 3)
+
+const STATES = {
+  0: "IDLE",
+  1: "STARTED",
+  2: "PLAYING"
+}
 
 function ZoomIn({ to = zoomIn } = {}) {
   useFrame(({ camera }) => {
@@ -29,53 +36,53 @@ function Grid({ ...props }) {
   )
 }
 
-const centerVec = new Vector3(0, 0, 0)
+const lookAt = new Vector3(0, 0, 0)
+
 export default function Scene() {
-  const mouse = useRef([0, 0])
+  const input = useRef([0, 0, 0])
+
+  useAccelerometer({
+    onMotion: (acceleration) =>
+      void ((input.current[0] = acceleration[0]),
+      (input.current[1] = acceleration[1]),
+      (input.current[2] = acceleration[2]))
+  })
+
   const lp = useRef()
   const [playingState, setPlayingState] = useState(false)
   const [started, setStarted] = useState(false)
-  const { size, viewport } = useThree()
-  const { active, progress, errors, item, loaded, total } = useProgress()
+  const [state, setState] = useState(STATES.IDLE)
+  const { size, mouse: _mouse } = useThree()
+  const { progress } = useProgress()
 
-  useEffect(() => {
-    const onMouseMove = (evt) => {
-      mouse.current[0] = -1 + (evt.x / size.width) * 2
-      mouse.current[1] = -1 + (evt.y / size.height) * 2
-    }
+  useFrame(({ camera }) => {
+    input.current[0] = _mouse.x
+    input.current[1] = _mouse.y
 
-    window.addEventListener("mousemove", onMouseMove, { passive: true })
-
-    return () => {
-      window.removeEventListener("mousemove", onMouseMove)
-    }
-  }, [size.width, size.height])
+    // lookAt.x = lerp(lookAt.x, input.current[0] * 0.2, 0.0075)
+    // lookAt.y = lerp(lookAt.y, input.current[1] * 0.2, 0.005)
+    // camera.lookAt(lookAt)
+  })
 
   return (
     <>
-      <ambientLight intensity={0.9} />
-      <pointLight position={[5, 1, 3]} intensity={1} />
-      {/* 
-      <pointLight position={[-5, -1, 0]} intensity={1} />
-      <spotLight
-        intensity={0.63}
-        position={[-30, 30, 10]}
-        angle={0.2}
-        penumbra={1}
-      /> */}
+      <color attach="background" args={["white"]} />
+      <ambientLight intensity={2.9} />
+      <pointLight position={[5, 1, -3]} intensity={1} />
+      <color attach="background" args={["#111"]} />
       <Suspense fallback={null}>
         <Background
           started={started}
           playingState={playingState}
-          position={[0, 4, -20]}
-          mouse={mouse.current}
+          position={[0, 0, 0]}
+          mouse={input.current}
         />
         <LP
           started={started}
           playingState={playingState}
           ref={lp}
-          mouse={mouse.current}
-          position={[0, 0, -3]}
+          mouse={input.current}
+          position={[0, 0, 0]}
           onPlay={() => {
             setPlayingState(true)
           }}
@@ -83,13 +90,9 @@ export default function Scene() {
             setPlayingState(false)
           }}
         />
-        {started && <Swarm mouse={mouse} />}
+        {/* {started && <Swarm mouse={input} />} */}
       </Suspense>
-      <Grid />
-      {started && !playingState && <ZoomIn />}
       {playingState && <ZoomIn to={zoomIn2} />}
-      {/* <Crystals /> */}
-      {/* <FboParticles /> */}
       <Html fullscreen>
         <Ui
           progress={progress}

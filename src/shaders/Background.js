@@ -31,19 +31,19 @@ export default class BackgroundMaterial extends ShaderMaterial {
           }
   
           void main() {
-              vec2 p = vUv;//(gl_FragCoord.xy/resolution.xy);
+              vec2 p = (gl_FragCoord.xy/resolution.xy);
               vec2 uv = vUv;
               vec2 m = mouse*0.25;
               m.y *= -1.0;
   
               float c = circle(uv, m+vec2(0.5), 0.0, 0.15);
-              float n = smoothstep(0.0, 0.59, hash(p));
-              vec3 noiseColor = vec3(n);
+              float n = hash(p);
+              vec3 noiseColor = vec3(n*0.5)*vec3(0.3);
               vec3 bgColor = vec3(0.82);
   
-              float r = texture2D(map, p+0.002).r;
-              float g = texture2D(map, p-0.002).g;
-              float b = texture2D(map, p+0.002).b;
+              float r = texture2D(map1, p+0.012).r;
+              float g = texture2D(map1, p-0.012).g;
+              float b = texture2D(map1, p+0.012).b;
   
               vec3 distColor = vec3(r, g, b);
   
@@ -51,11 +51,13 @@ export default class BackgroundMaterial extends ShaderMaterial {
   
               vec2 depth = mouse * 0.02 * pow(abs(p.x-0.5), 0.5);
               float warp = texture2D(noise, p+depth+time*0.02).r*0.05;
-              vec4 bg = texture2D(map, p + depth+warp*c);
+              vec4 bg = texture2D(map, p);
   
               // offset.x += mouse.x *0.01* abs(pow(p.x,0.75)); //length(uv - vec2(0.5));
               
-              gl_FragColor = vec4(mix(mix(bg.rgb*0.025, distColor, c), video, videoAlpha), 1.0) * alpha;
+              gl_FragColor = vec4(mix(mix(vec3(noiseColor), distColor*0.5, videoAlpha), video, videoAlpha), 1.0) * alpha;
+              //gl_FragColor = vec4(0.9*noiseColor, 1.0);
+
             }
         `,
       uniforms: {

@@ -1,17 +1,21 @@
 import * as THREE from "three"
 import React, { useRef, useMemo } from "react"
 import { extend, useFrame, useLoader } from "react-three-fiber"
-import { TextureLoader } from "three"
+import { MirroredRepeatWrapping, TextureLoader, VideoTexture } from "three"
 import BackgroundMaterial from "./shaders/Background"
 import lerp from "lerp"
 
 extend({ BackgroundMaterial })
 const dummy = new THREE.Object3D()
 
-export default function Swarm({ count = 25, mouse }) {
+const videoTexture = new VideoTexture(document.getElementById("video"))
+videoTexture.wrapS = MirroredRepeatWrapping
+videoTexture.wrapT = MirroredRepeatWrapping
+
+export default function Swarm({ count = 250, mouse }) {
   const mesh = useRef()
 
-  const [map] = useLoader(TextureLoader, ["/cover-front-a_NRM.png"])
+  const [map] = useLoader(TextureLoader, ["/cover_norm.png", "/cover_disp.png"])
 
   const particles = useMemo(() => {
     const temp = []
@@ -19,9 +23,9 @@ export default function Swarm({ count = 25, mouse }) {
       const t = Math.random() * 100
       const factor = 1 + Math.random() * 2
       const speed = 0.01 + Math.random() / 200
-      const xFactor = -20 + Math.random() * 40
-      const yFactor = -20 + Math.random() * 40
-      const zFactor = -40 + Math.random() * 20
+      const xFactor = -5 + Math.random() * 10
+      const yFactor = -5 + Math.random() * 10
+      const zFactor = -5 + Math.random() * 10
       temp.push({ t, factor, speed, xFactor, yFactor, zFactor, mx: 0, my: 0 })
     }
     return temp
@@ -41,11 +45,8 @@ export default function Swarm({ count = 25, mouse }) {
           xFactor +
           Math.cos((t / 10) * factor) +
           (Math.sin(t * 1) * factor) / 10,
-        (particle.my / 10) * b +
-          yFactor +
-          Math.sin((t / 10) * factor) +
-          (Math.cos(t * 2) * factor) / 10,
-        -20 + yFactor // + Math.sin((t / 10) * factor) + (Math.cos(t * 2) * factor) / 10
+        particle.my / 10 + yFactor,
+        zFactor // + Math.sin((t / 10) * factor) + (Math.cos(t * 2) * factor) / 10
       )
 
       //dummy.scale.set(s, s, s)
@@ -59,9 +60,11 @@ export default function Swarm({ count = 25, mouse }) {
   return (
     <>
       <instancedMesh ref={mesh} args={[null, null, count]}>
-        <boxBufferGeometry attach="geometry" args={[2, 2, 2]} />
+        <boxBufferGeometry attach="geometry" args={[0.2, 0.2, 0.2]} />
         <meshNormalMaterial
+          map={videoTexture}
           bumpMap={map}
+          displacementMap={map}
           //normalMap={map}
           bumpScale={1}
           //   bumpMap={map}

@@ -9,6 +9,7 @@ import {
   useUpdate
 } from "react-three-fiber"
 import {
+  BackSide,
   DoubleSide,
   MirroredRepeatWrapping,
   TextureLoader,
@@ -24,13 +25,10 @@ videoTexture.wrapT = MirroredRepeatWrapping
 
 export default function Background({ mouse, started, playingState, ...props }) {
   const mesh = useRef()
-  const { size } = useThree()
-  const scale = useAspect("cover", 480, 480, 1)
+  const { size, viewport } = useThree()
+  const scale = useAspect("cover", size.width, size.height, 1)
 
-  const [map, noise] = useLoader(TextureLoader, [
-    "/cover-front-a_NRM.png",
-    "/noise-a.jpg"
-  ])
+  const [map, noise] = useLoader(TextureLoader, ["/bg.jpg", "/noise-a.jpg"])
 
   useUpdate(() => {
     map.wrapS = MirroredRepeatWrapping
@@ -58,21 +56,17 @@ export default function Background({ mouse, started, playingState, ...props }) {
 
   useFrame(({ clock }) => {
     if (!mesh.current) return
-
     const t = clock.getElapsedTime()
-
     mesh.current.material.uniforms.time.value = t
     mesh.current.material.uniforms.mouse.value = [
       Math.cos(t * 0.75) * 1,
       Math.sin(t * 0.75) * 1
     ]
-
     mesh.current.material.uniforms.alpha.value = lerp(
       mesh.current.material.uniforms.alpha.value,
       1.0,
       0.01
     )
-
     if (playingState) {
       mesh.current.material.uniforms.videoAlpha.value = lerp(
         mesh.current.material.uniforms.videoAlpha.value,
@@ -90,9 +84,13 @@ export default function Background({ mouse, started, playingState, ...props }) {
 
   return (
     <mesh ref={mesh} {...props}>
-      <planeBufferGeometry scale={scale} attach="geometry" args={[20, 10, 1]} />
+      <sphereBufferGeometry
+        scale={scale}
+        attach="geometry"
+        args={[4, 32, 32]}
+      />
       <backgroundMaterial
-        // side={DoubleSide}
+        side={BackSide}
         uniforms-map-value={map}
         uniforms-map1-value={videoTexture}
         uniforms-noise-value={noise}
@@ -101,7 +99,7 @@ export default function Background({ mouse, started, playingState, ...props }) {
           size.height * window.devicePixelRatio
         ]}
       />
-      {/* <meshStandardMaterial map={map} color="#fff" /> */}
+      {/* <meshStandardMaterial map={videoTexture} side={BackSide} /> */}
     </mesh>
   )
 }

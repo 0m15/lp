@@ -81,15 +81,16 @@ const LP = forwardRef(
         axis,
         velocity
       }) => {
-        const trigger = velocity > 0.4
-        let dy = (my / window.innerHeight) * 2
+        let dy = my / window.innerHeight
         let dx = (mx / window.innerWidth) * 2
 
-        const rotateY = xDir > 0 ? 1 : 0
+        const trigger = velocity > 0.4 || Math.abs(dx) > 0.6
+
+        const rotateY =
+          xDir > 0 ? lastRotation.current + 1 : lastRotation.current - 1
         const offsetY = yDir > 0 ? 0 : 0.5
 
         if (axis === "y") {
-          console.log("y.axis")
           if (!down && trigger) {
             offsetY ? onPlay() : onPause()
             setOffset({ y: offsetY })
@@ -108,13 +109,6 @@ const LP = forwardRef(
         } else if (!down) {
           setRotation({ y: lastRotation.current })
         } else {
-          if (
-            (lastRotation.current === 0 && !xDir) ||
-            (lastRotation.current > 0 && xDir)
-          ) {
-            // d *= 0.2
-          }
-
           setRotation({ y: lastRotation.current + dx })
         }
       },
@@ -135,8 +129,6 @@ const LP = forwardRef(
         ref={group}
         {...props}
         position-y={offset.y.to((d) => d * -5)}
-        position-z={rotate.y.to((d) => d * 0.01)}
-        //rotation-x={offset.y.to((d) => d * 0.5)}
         rotation-y={rotate.y.to((d) => d * Math.PI)}>
         <Vinyl position-y={offset.y.to((d) => d * Math.PI)} ref={vinyl} />
         <MorphMesh mouse={mouse} started={started} />

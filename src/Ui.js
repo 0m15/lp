@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { a, useTransition, useTrail, useSpring } from "@react-spring/web"
-import Text from "./Text"
-import { useFrame, useThree } from "react-three-fiber"
-import lerp from "lerp"
+import { Plus } from "phosphor-react"
 
 function Transition({
   prop,
@@ -71,11 +69,11 @@ export default function Ui({ progress, playingState, onStart, started }) {
 
   return (
     <div className="ui" onClick={started ? null : onStart}>
-      <div className="top center">
+      {/* <div className="top center">
         <Reveal height={30} style={trail[0]} className="fs2 ttu oh">
           band name
         </Reveal>
-      </div>
+      </div> */}
       <div className="center middle">
         <Transition prop={progress < 100}>
           <a.div className="fs1 ttu ls2 tc">
@@ -93,20 +91,17 @@ export default function Ui({ progress, playingState, onStart, started }) {
           ~ launch ~
         </Transition>
         <Transition prop={started && !playingState} className="fs5 ls3 abs">
-          <div style={{ marginTop: 380 }}>
-            swipe to flip side
-            <br />⬄
+          <div style={{ marginTop: 360 }}>
+            <div className="icon1">⬄</div>
           </div>
         </Transition>
         <Transition prop={started && !playingState} className="fs5 ls3 abs">
           <div
             style={{
-              top: "50%",
-              marginLeft: -380,
+              marginLeft: -360,
               transform: "rotate(90deg)"
             }}>
-            swipe up to play
-            <br />⬄
+            <div className="icon1">⬄</div>
           </div>
         </Transition>
       </div>
@@ -114,16 +109,16 @@ export default function Ui({ progress, playingState, onStart, started }) {
       {/* <div className="bottom center fs6 ttu ls3 a3">
         &copy; 2020 dna records
       </div> */}
-      <div className="bottom center">
-        <Reveal height={20} style={trail[2]} className="tc fs3 ttu ls1">
+      {/* <div className="bottom center">
+        <Reveal height={30} style={trail[2]} className="tc fs3 ttu ls1">
           album name
         </Reveal>
-      </div>
-      {/* <div className="bottom right">
-        <Reveal height={20} style={trail[3]} className=" fs3 ttu ls1">
-          share+
-        </Reveal>
       </div> */}
+      <div className="abs bottom right">
+        <Reveal height={40} style={trail[3]} className=" fs3 ttu ls1">
+          <Plus color="#fff" weight="thin" size={40} />
+        </Reveal>
+      </div>
     </div>
   )
 }

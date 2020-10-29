@@ -2,13 +2,18 @@ import lerp from "lerp"
 import React, { useMemo, useRef, useState } from "react"
 import { extend, useFrame, useLoader, useUpdate } from "react-three-fiber"
 import {
+  BackSide,
   BoxBufferGeometry,
   ConeBufferGeometry,
   DodecahedronBufferGeometry,
+  DoubleSide,
   Float32BufferAttribute,
+  FrontSide,
   IcosahedronBufferGeometry,
+  MeshBasicMaterial,
   MeshPhongMaterial,
   MeshPhysicalMaterial,
+  MeshStandardMaterial,
   ShaderMaterial,
   TetrahedronBufferGeometry,
   TextureLoader,
@@ -16,7 +21,6 @@ import {
 } from "three"
 import { snoise } from "./shaders/snoise"
 
-// https://blog.mozvr.com/customizing-vertex-shaders/
 export const mat = new MeshPhongMaterial()
 export let materialShader = null
 
@@ -25,6 +29,9 @@ mat.onBeforeCompile = (shader) => {
   shader.uniforms.time = { value: 0 }
   shader.vertexShader = `
     uniform float time;
+    uniform vec2 mouse;
+    uniform sampler2D bumpMap;
+    uniform sampler2D normalMap;
     ${snoise}
     ${shader.vertexShader}
   `
@@ -32,121 +39,94 @@ mat.onBeforeCompile = (shader) => {
     "#include <begin_vertex>",
     `
     vec3 transformed = vec3(position);
-    float d = 0.015;
-    float displ = snoise(transformed*1.0+time*0.1) * d - d / 2.0;
-    transformed += displ;
+    vec2 offset = vec2(-mouse.x, mouse.y) * 0.25;
+    float d = texture2D(bumpMap, uv).z*0.01;
+    float displ = snoise(transformed*1.0+time*0.2) * d - d / 2.0;
+    transformed.z += displ*d*(1.0-length(uv-0.5));
+    transformed.xy += offset*d;
+    transformedNormal.z += displ*d*(1.0-length(uv-0.5));
+    transformedNormal.xy += offset*d;
     `
   )
-
-  shader.vertexShader = shader.vertexShader.replace(
-    "#include <morphtarget_vertex>",
-    `
-  #ifdef USE_MORPHTARGETS
-    // morphTargetBaseInfluence is set based on BufferGeometry.morphTargetsRelative value:
-    // When morphTargetsRelative is false, this is set to 1 - sum(influences); this results in position = sum((target - base) * influence)
-    // When morphTargetsRelative is true, this is set to 1; as a result, all morph targets are simply added to the base after weighting
-    float displ1 = snoise(morphTarget0 * 4.0 + time * 0.25) * d - d / 2.0;
-
-    transformed *= morphTargetBaseInfluence;
-    transformed += (morphTarget0 + displ1) * morphTargetInfluences[ 0 ];
-    transformed += morphTarget1 * morphTargetInfluences[ 1 ];
-    transformed += morphTarget2 * morphTargetInfluences[ 2 ];
-    transformed += morphTarget3 * morphTargetInfluences[ 3 ];
-	#ifndef USE_MORPHNORMALS
-    transformed += morphTarget4 * morphTargetInfluences[ 4 ];
-    transformed += morphTarget5 * morphTargetInfluences[ 5 ];
-    transformed += morphTarget6 * morphTargetInfluences[ 6 ];
-    transformed += morphTarget7 * morphTargetInfluences[ 7 ];
-	#endif
-#endif
-      `
-  )
-
-  shader.fragmentShader = `
-    uniform float time;
-    uniform vec2 mouse;
-
-    ${snoise}
-    ${shader.fragmentShader}
-  `
 
   shader.fragmentShader = shader.fragmentShader.replace(
-    "#include <dithering_fragment>",
-    `
-    #include <dithering_fragment>
-    
-    vec3 color = texture2D(map, vUv).rgb;
-    float d = (gl_FragColor.g+gl_FragColor.r+gl_FragColor.b)/3.0;
-    vec2 offset = vec2(mouse.x * d, mouse.y * d) * 0.05;
-    vec3 outColor = texture2D(map, vUv + offset).rgb;
-    
-    gl_FragColor = vec4(mix(outColor.rgb, normal.rgb, d*d), gl_FragColor.a);
-    //gl_FragColor = vec4(outColor.rgb, gl_FragColor.a);
+    "#include <map_fragment>",
+    ` 
+    #ifdef USE_MAP
+      vec4 texelColor = texture2D( map, vUv );
+      vec4 bmap = texture2D( bumpMap, vUv );
+      vec4 nmap = texture2D( normalMap, vUv );
+      texelColor = mapTexelToLinear( texelColor );
+      diffuseColor *= texelColor * (bmap.z);
+    #endif
     `
   )
+
+  // shader.fragmentShader = `
+  //   uniform float time;
+  //   uniform vec2 mouse;
+
+  //   ${snoise}
+  //   ${shader.fragmentShader}
+  // `
+
+  // shader.fragmentShader = shader.fragmentShader.replace(
+  //   "#include <map_fragment>",
+  //   `
+  //   #ifdef USE_MAP
+
+  //     float d = 1.0-distance(vUv-vec2(0.5), mouse);
+  //     vec2 offset1 = vec2(-mouse.x, mouse.y) * 0.05;
+
+  //     vec3 bumpM = texture2D(bumpMap, vUv).xyz;
+  //     vec3 norm = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+  //     vec3 mapN = texture2D( normalMap, vUv+offset1*bumpM.z *d ).xyz * 2.0 - 1.0;
+
+  //     vec4 texelColor = texture2D( map, vUv+offset1 * bumpM.z);
+  //     texelColor = mapTexelToLinear( texelColor );
+  //     diffuseColor *= texelColor;
+  //   #endif
+  //   `
+  // )
+
+  // shader.fragmentShader = shader.fragmentShader.replace(
+  //   "#include <normal_fragment_maps>",
+  //   `
+  //   vec2 offset = vec2(mouse.x, mouse.y) * 0.01;
+
+  //   #ifdef OBJECTSPACE_NORMALMAP
+
+  //   normal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+
+  //   #ifdef FLIP_SIDED
+  // 	  normal = - normal;
+  //   #endif
+  //   #ifdef DOUBLE_SIDED
+  // 	  normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+  //   #endif
+  //   normal = normalize( normalMatrix * normal );
+  //   #elif defined( TANGENTSPACE_NORMALMAP )
+  //   mapN.xy *= normalScale;
+  //   #ifdef USE_TANGENT
+  //     normal = normalize( vTBN * mapN );
+  //   #else
+  //     normal = perturbNormal2Arb( -vViewPosition, normal, mapN );
+  //   #endif
+  // #elif defined( USE_BUMPMAP )
+  //   normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );
+  // #endif
+
+  // texelColor = vec4(1.0);//texture2D( map, vUv+offset1*normal.z );
+  // texelColor = mapTexelToLinear( texelColor );
+  // diffuseColor *= texelColor;
+  //   `
+  // )
+
   materialShader = shader
 }
 
 export const createMorphGeometry = () => {
-  var geometry = new BoxBufferGeometry(2, 2, 2, 32, 32, 32)
-  var geometry1 = new IcosahedronBufferGeometry(1.5, 2)
-  //var geometry1 = new ConeBufferGeometry(1.5, 1.5, 32, 32)
-  //var geometry1 = new BoxBufferGeometry(1.5, 1.5, 1.5, 32, 32, 32)
-
-  // create an empty array to hold targets for the attribute we want to morph
-  // morphing positions and normals is supported
-  geometry.morphAttributes.position = []
-
-  // the original positions of the cube's vertices
-  var positions = geometry.attributes.position.array
-  var positions1 = geometry1.attributes.position.array
-
-  // for the first morph target we'll move the cube's vertices onto the surface of a sphere
-  var spherePositions = []
-  var boxPositions = []
-
-  // for the second morph target, we'll twist the cubes vertices
-  var twistPositions = []
-  var direction = new Vector3(1, 0, 0).normalize()
-  var vertex = new Vector3()
-
-  for (var i = 0; i < positions.length; i += 3) {
-    var x = positions[i]
-    var y = positions[i + 1]
-    var z = positions[i + 2]
-
-    spherePositions.push(
-      x * Math.sqrt(1 - (y * y) / 2 - (z * z) / 2 + (y * y * z * z) / 3),
-      y * Math.sqrt(1 - (z * z) / 2 - (x * x) / 2 + (z * z * x * x) / 3),
-      z * Math.sqrt(1 - (x * x) / 2 - (y * y) / 2 + (x * x * y * y) / 3)
-    )
-
-    boxPositions.push(positions1[i], positions1[i + 1], positions1[i + 2])
-
-    // stretch along the x-axis so we can see the twist better
-    vertex.set(x * 2, y, z)
-
-    vertex
-      .applyAxisAngle(direction, (Math.PI * x) / 2)
-      .toArray(twistPositions, twistPositions.length)
-  }
-
-  // add the spherical positions as the first morph target
-  // geometry.morphAttributes.position[0] = new Float32BufferAttribute(
-  //   spherePositions,
-  //   3
-  // )
-
-  // // add the twisted positions as the second morph target
-  // geometry.morphAttributes.position[1] = new Float32BufferAttribute(
-  //   twistPositions,
-  //   3
-  // )
-
-  // // Hack required to get Mesh to have morphTargetInfluences attribute
-  // geometry.morphTargets = []
-  // geometry.morphTargets.push(0)
-
+  var geometry = new BoxBufferGeometry(2, 2, 0.01, 32, 32, 32)
   return geometry
 }
 
@@ -156,9 +136,10 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
   const [isActive, setActive] = useState(false)
   const [isHover, setHover] = useState(false)
 
-  const [map, normalMap] = useLoader(TextureLoader, [
-    "/cover-front-a.jpg",
-    "/cover-front-a_NRM.png"
+  const [map, normalMap, bumpMap] = useLoader(TextureLoader, [
+    "/cover_color.png",
+    "/cover_norm.png",
+    "/cover_disp.png"
   ])
 
   const n = useRef(Math.random() * 9 - 5)
@@ -167,9 +148,9 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
 
   useFrame(({ clock, frames, ...props }) => {
     if (!mesh.current) return
-    if (!mesh.current.morphTargetInfluences) mesh.current.updateMorphTargets()
 
     const t = clock.getElapsedTime()
+
     if (materialShader) {
       materialShader.uniforms.time.value = t
       materialShader.uniforms.mouse.value = [
@@ -178,51 +159,17 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
       ]
     }
 
-    if (f.current % 10 === 0) n.current = Math.random() * 6 + 1
-
-    if (isHover && !started) {
-      // mesh.current.morphTargetInfluences[0] = lerp(
-      //   mesh.current.morphTargetInfluences[0],
-      //   n.current,
-      //   0.5
-      // )
-      mesh.current.rotation.y += 0.005
-      //mesh.current.material.wireframe = true
-    } else if (started) {
-      // mesh.current.morphTargetInfluences[0] = lerp(
-      //   mesh.current.morphTargetInfluences[0],
-      //   0,
-      //   0.1
-      // )
-      mesh.current.scale.z = lerp(mesh.current.scale.z, 0.01, 0.05)
-      mesh.current.rotation.y = lerp(mesh.current.rotation.y, -Math.PI, 0.05)
-      // mesh.current.material.wireframe = false
+    if (started) {
+      //mesh.current.rotation.y = lerp(mesh.current.rotation.y, -Math.PI, 0.05)
     } else {
-      // mesh.current.morphTargetInfluences[0] = lerp(
-      //   mesh.current.morphTargetInfluences[0],
-      //   1, //Math.sin(t * 0.5) + 2,
-      //   0.25
-      // )
-
-      //mesh.current.morphTargetInfluences[0] = 4
-      mesh.current.scale.x = 1 // + Math.sin(t * 0.5) * 0.25
-      mesh.current.scale.y = 1 // + Math.sin(t * 0.5) * 0.25
-      mesh.current.scale.z = 1 // + Math.sin(t * 0.5) * 0.25
-
-      mesh.current.rotation.y += 0.005
-      //mesh.current.material.wireframe = true
+      //mesh.current.rotation.y += 0.005
     }
 
     f.current += 1
-
-    //    if (f.current % 5 === 0) {
-    //i.current = Math.max(10, Math.round(((Math.sin(t) + 1) / 2) * 30))
     i.current = Math.round(((Math.sin(t) + 1) / 2) * 10)
 
-    //    }
-
     if (t < 2) return
-    mesh.current.material.opacity = lerp(mesh.current.material.opacity, 1, 0.01)
+    //mesh.current.material.opacity = lerp(mesh.current.material.opacity, 1, 0.01)
     //mesh.current.morphTargetInfluences[1] = (Math.sin(t) + 1) * 0.15
   })
 
@@ -230,30 +177,32 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
     <mesh
       //position={[0, 0, -2]}
       ref={mesh}
-      onPointerDown={onPointerDown}
-      onPointerOver={() => {
-        setHover(true)
-      }}
-      onPointerOut={() => {
-        if (started) return
-        setHover(false)
-      }}
+      //onPointerDown={onPointerDown}
+      // onPointerOver={() => {
+      //   setHover(true)
+      // }}
+      // onPointerOut={() => {
+      //   if (started) return
+      //   setHover(false)
+      // }}
       {...props}>
-      <primitive object={geometry} attach="geometry" />
-      {/* <boxBufferGeometry args={[2, 2, 2]} /> */}
+      {/* <primitive object={geometry} attach="geometry" /> */}
+      <boxBufferGeometry
+        args={[1.5, 1.5, 0.02, 128, 128, 128]}
+        attach="geometry"
+      />
       <primitive
         object={mat}
         attach="material"
-        morphTargets
         map={map}
         normalMap={normalMap}
-        normalScale={[0.2, 0.2]}
-        //specularMap={bumpMap}
-        //specular="white"
-        transparent
-        opacity={0}
-        color="lightpink"
-        wireframe={!started}
+        bumpMap={bumpMap}
+        displacementMap={bumpMap}
+        displacementScale={0}
+        bumpScale={0}
+        specularColor="darkgray"
+        // displacementBias={-0.1}
+        // displacementScale={0.1}
       />
       {/* <customMaterial attach="material" map={map} morphTargets /> */}
     </mesh>
