@@ -17,11 +17,7 @@ const PLAYING = 3
 const DT = 0.075
 
 const Vinyl = React.forwardRef((props, ref) => {
-  const [map, bump, normal] = useLoader(TextureLoader, [
-    "/vinyl-a.png",
-    "/cover-front-a_NRM.png",
-    "/vinyl-a-normal.png"
-  ])
+  const [map] = useLoader(TextureLoader, ["/vinyl-a.png"])
 
   return (
     <a.mesh {...props} ref={ref}>

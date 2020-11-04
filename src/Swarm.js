@@ -15,7 +15,7 @@ videoTexture.wrapT = MirroredRepeatWrapping
 export default function Swarm({ count = 250, mouse }) {
   const mesh = useRef()
 
-  const [map] = useLoader(TextureLoader, ["/cover_norm.png", "/cover_disp.png"])
+  const [map] = useLoader(TextureLoader, ["/cover_norm.jpg", "/cover_disp.jpg"])
 
   const particles = useMemo(() => {
     const temp = []

@@ -28,7 +28,10 @@ export default function Background({ mouse, started, playingState, ...props }) {
   const { size, viewport } = useThree()
   const scale = useAspect("cover", size.width, size.height, 1)
 
-  const [map, noise] = useLoader(TextureLoader, ["/bg.jpg", "/noise-a.jpg"])
+  const [map, noise] = useLoader(TextureLoader, [
+    "/cover_color.jpg",
+    "/noise-a.jpg"
+  ])
 
   useUpdate(() => {
     map.wrapS = MirroredRepeatWrapping
