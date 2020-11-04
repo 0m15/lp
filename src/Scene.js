@@ -1,16 +1,10 @@
-import React, { Suspense, useEffect, useRef, useState } from "react"
+import React, { Suspense, useRef, useState } from "react"
 import Background from "./Background"
-import { ContactShadows, Html, Shadow, Stars, Text, useProgress } from "drei"
+import { Html, useProgress } from "drei"
 import Ui from "./Ui"
 import { useFrame, useThree } from "react-three-fiber"
-import Crystals from "./Crystals"
 import { Vector3 } from "three"
-import Text3d from "./Text3d"
-import MorphMesh from "./MorphMesh"
-import FboParticles from "./Particles"
 import LP from "./LP"
-import Swarm from "./Swarm"
-import lerp from "lerp"
 import useAccelerometer from "./MotionSensor"
 
 const zoomIn = new Vector3(0, 0, 5)
@@ -30,14 +24,7 @@ function ZoomIn({ to = zoomIn } = {}) {
   return null
 }
 
-function Grid({ ...props }) {
-  return (
-    <gridHelper args={[22, 20, 0x111111, 0x111111]} position={[0, -1, -10]} />
-  )
-}
-
 const lookAt = new Vector3(0, 0, 0)
-
 export default function Scene() {
   const input = useRef([0, 0, 0])
 
@@ -50,7 +37,7 @@ export default function Scene() {
 
   const lp = useRef()
   const [playingState, setPlayingState] = useState(false)
-  const [started, setStarted] = useState(false)
+  const [started, setStarted] = useState(true)
   const [state, setState] = useState(STATES.IDLE)
   const { size, mouse: _mouse } = useThree()
   const { progress } = useProgress()
@@ -90,9 +77,7 @@ export default function Scene() {
             setPlayingState(false)
           }}
         />
-        {/* {started && <Swarm mouse={input} />} */}
       </Suspense>
-      {playingState && <ZoomIn to={zoomIn2} />}
       <Html fullscreen>
         <Ui
           progress={progress}

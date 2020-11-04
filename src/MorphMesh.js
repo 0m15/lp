@@ -137,9 +137,9 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
   const [isHover, setHover] = useState(false)
 
   const [map, normalMap, bumpMap] = useLoader(TextureLoader, [
-    "/cover_color.png",
-    "/cover_norm.png",
-    "/cover_disp.png"
+    "/cover_color.jpg",
+    "/cover_norm.jpg",
+    "/cover_disp.jpg"
   ])
 
   const n = useRef(Math.random() * 9 - 5)

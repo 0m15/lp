@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap");
+
 * {
   box-sizing: border-box;
 }
@@ -30,8 +32,9 @@ body {
 /* font */
 html,
 body {
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  color: #c9dfe3;
+  font-family: UnifrakturMaguntia, "Franklin Gothic Medium", "Arial Narrow",
+    Arial, sans-serif;
+  color: rgb(234, 112, 255);
 }
 
 /* positioning */

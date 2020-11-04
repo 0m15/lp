@@ -28,8 +28,8 @@ const Vinyl = React.forwardRef((props, ref) => {
       <circleBufferGeometry attach="geometry" args={[0.7, 64]} />
       <meshPhongMaterial
         map={map}
-        bumpMap={bump}
-        normalMap={normal}
+        // bumpMap={bump}
+        // normalMap={normal}
         bumpScale={1}
         attach="material"
         //color="rgba(250, 190, 0, 0.5)"

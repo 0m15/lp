@@ -14,8 +14,6 @@ function App() {
     <Canvas
       pixelRatio={Math.min(2, window.devicePixelRatio)}
       colorManagement
-      concurrent
-      //orthographic
       gl={{
         powerPreference: "high-performance",
         antialias: false

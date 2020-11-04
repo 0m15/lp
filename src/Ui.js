@@ -87,10 +87,10 @@ export default function Ui({ progress, playingState, onStart, started }) {
               background: "currentColor"
             }}></a.div>
         </Transition>
-        <Transition prop={isReady && !started} className="fs5 ttu ls5 abs">
+        {/* <Transition prop={isReady && !started} className="fs5 ttu ls5 abs">
           ~ launch ~
-        </Transition>
-        <Transition prop={started && !playingState} className="fs5 ls3 abs">
+        </Transition> */}
+        {/* <Transition prop={started && !playingState} className="fs5 ls3 abs">
           <div style={{ marginTop: 360 }}>
             <div className="icon1">⬄</div>
           </div>
@@ -103,7 +103,7 @@ export default function Ui({ progress, playingState, onStart, started }) {
             }}>
             <div className="icon1">⬄</div>
           </div>
-        </Transition>
+        </Transition> */}
       </div>
 
       {/* <div className="bottom center fs6 ttu ls3 a3">
