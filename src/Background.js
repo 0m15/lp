@@ -33,7 +33,7 @@ export default function Background({ mouse, started, playingState, ...props }) {
     "/noise-a.jpg"
   ])
 
-  useUpdate(() => {
+  const ref = useUpdate(() => {
     map.wrapS = MirroredRepeatWrapping
     map.wrapT = MirroredRepeatWrapping
     noise.wrapS = MirroredRepeatWrapping
@@ -87,13 +87,10 @@ export default function Background({ mouse, started, playingState, ...props }) {
 
   return (
     <mesh ref={mesh} {...props}>
-      <sphereBufferGeometry
-        scale={scale}
-        attach="geometry"
-        args={[4, 32, 32]}
-      />
+      <planeBufferGeometry attach="geometry" args={[1, 1]} />
       <backgroundMaterial
-        side={BackSide}
+        ref={ref}
+        // side={BackSide}
         uniforms-map-value={map}
         uniforms-map1-value={videoTexture}
         uniforms-noise-value={noise}
@@ -102,7 +99,7 @@ export default function Background({ mouse, started, playingState, ...props }) {
           size.height * window.devicePixelRatio
         ]}
       />
-      {/* <meshStandardMaterial map={videoTexture} side={BackSide} /> */}
+      {/* <meshStandardMaterial /> */}
     </mesh>
   )
 }

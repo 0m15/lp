@@ -6,22 +6,17 @@ import VideoMaterial from "./VideoMaterial"
 import MorphMesh from "./MorphMesh"
 import { useDrag } from "react-use-gesture"
 import { useSpring, a } from "@react-spring/three"
+import Video from "./Video"
+import Background from "./Background"
 
 extend({ VideoMaterial })
-
-const SIDE_A = 0
-const SIDE_B = 1
-const SHOW_VINYL = 2
-const PLAYING = 3
-
-const DT = 0.075
 
 const Vinyl = React.forwardRef((props, ref) => {
   const [map] = useLoader(TextureLoader, ["/vinyl-a.png"])
 
   return (
     <a.mesh {...props} ref={ref}>
-      <circleBufferGeometry attach="geometry" args={[0.7, 64]} />
+      <circleBufferGeometry attach="geometry" args={[0.5, 64]} />
       <meshPhongMaterial
         map={map}
         // bumpMap={bump}
@@ -121,14 +116,24 @@ const LP = forwardRef(
     })
 
     return (
-      <a.group
-        ref={group}
-        {...props}
-        position-y={offset.y.to((d) => d * -5)}
-        rotation-y={rotate.y.to((d) => d * Math.PI)}>
-        <Vinyl position-y={offset.y.to((d) => d * Math.PI)} ref={vinyl} />
-        <MorphMesh mouse={mouse} started={started} />
-      </a.group>
+      <>
+        <a.group
+          ref={group}
+          {...props}
+          //position-y={offset.y.to((d) => d * -5)}
+          rotation-y={rotate.y.to((d) => d * Math.PI)}>
+          <Vinyl position-y={offset.y.to((d) => d)} ref={vinyl} />
+          <MorphMesh mouse={mouse} started={started} />
+        </a.group>
+        <a.group position-z={offset.y.to((d) => d)}>
+          <Background
+            started={true}
+            playingState={playingState}
+            position={[0, 0, 0]}
+          />
+        </a.group>
+        {/* <Video playingState={playingState} /> */}
+      </>
     )
   }
 )

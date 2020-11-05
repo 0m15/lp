@@ -24,7 +24,7 @@ function App() {
       }}
       camera={{
         fov: 50,
-        position: [0, 0, 4]
+        position: [0, 0, 3]
       }}>
       <Scene />
     </Canvas>

@@ -187,10 +187,7 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
       // }}
       {...props}>
       {/* <primitive object={geometry} attach="geometry" /> */}
-      <boxBufferGeometry
-        args={[1.5, 1.5, 0.02, 128, 128, 128]}
-        attach="geometry"
-      />
+      <boxBufferGeometry args={[1, 1, 0.02, 128, 128, 128]} attach="geometry" />
       <primitive
         object={mat}
         attach="material"

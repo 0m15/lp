@@ -58,12 +58,12 @@ export default function Scene() {
       <pointLight position={[5, 1, -3]} intensity={1} />
       <color attach="background" args={["#111"]} />
       <Suspense fallback={null}>
-        <Background
+        {/* <Background
           started={started}
           playingState={playingState}
           position={[0, 0, 0]}
           mouse={input.current}
-        />
+        /> */}
         <LP
           started={started}
           playingState={playingState}
