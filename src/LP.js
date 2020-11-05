@@ -1,12 +1,10 @@
 import React, { forwardRef, useCallback, useRef, useState } from "react"
 import { extend, useFrame, useLoader, useThree } from "react-three-fiber"
 import { DoubleSide, TextureLoader, VideoTexture } from "three"
-import lerp from "lerp"
 import VideoMaterial from "./VideoMaterial"
 import MorphMesh from "./MorphMesh"
 import { useDrag } from "react-use-gesture"
 import { useSpring, a } from "@react-spring/three"
-import Video from "./Video"
 import Background from "./Background"
 
 extend({ VideoMaterial })
@@ -19,11 +17,8 @@ const Vinyl = React.forwardRef((props, ref) => {
       <circleBufferGeometry attach="geometry" args={[0.5, 64]} />
       <meshPhongMaterial
         map={map}
-        // bumpMap={bump}
-        // normalMap={normal}
         bumpScale={1}
         attach="material"
-        //color="rgba(250, 190, 0, 0.5)"
         side={DoubleSide}
         transparent
       />
@@ -120,7 +115,6 @@ const LP = forwardRef(
         <a.group
           ref={group}
           {...props}
-          //position-y={offset.y.to((d) => d * -5)}
           rotation-y={rotate.y.to((d) => d * Math.PI)}>
           <Vinyl position-y={offset.y.to((d) => d)} ref={vinyl} />
           <MorphMesh mouse={mouse} started={started} />
@@ -132,7 +126,6 @@ const LP = forwardRef(
             position={[0, 0, 0]}
           />
         </a.group>
-        {/* <Video playingState={playingState} /> */}
       </>
     )
   }

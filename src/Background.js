@@ -90,7 +90,7 @@ export default function Background({ mouse, started, playingState, ...props }) {
       <planeBufferGeometry attach="geometry" args={[1, 1]} />
       <backgroundMaterial
         ref={ref}
-        // side={BackSide}
+        side={DoubleSide}
         uniforms-map-value={map}
         uniforms-map1-value={videoTexture}
         uniforms-noise-value={noise}

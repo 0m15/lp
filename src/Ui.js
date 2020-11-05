@@ -1,6 +1,16 @@
 import React, { useEffect, useRef, useState } from "react"
 import { a, useTransition, useTrail, useSpring } from "@react-spring/web"
-import { Plus } from "phosphor-react"
+import {
+  ArrowArcLeft,
+  ArrowArcRight,
+  ArrowBendLeftUp,
+  ArrowBendUpLeft,
+  ArrowBendUpRight,
+  ArrowURightUp,
+  ArrowUUpLeft,
+  ArrowUUpRight,
+  Plus
+} from "phosphor-react"
 
 function Transition({
   prop,
@@ -40,8 +50,8 @@ function Reveal({
 }
 
 export default function Ui({ progress, playingState, onStart, started }) {
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [isReady, setIsReady] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showHint, setShowHint] = useState(false)
 
   const prog = useSpring({
     value: progress
@@ -50,22 +60,50 @@ export default function Ui({ progress, playingState, onStart, started }) {
   const trail = useTrail(4, {
     opacity: started ? 1 : 0,
     height: started ? 1 : 0,
-    //y: started ? 0 : -5,
     config: {
       duration: 1200
     }
   })
 
-  useEffect(() => {
-    if (progress >= 100) {
-      setTimeout(() => {
-        setIsLoaded(true)
-      }, 1000)
-      setTimeout(() => {
-        setIsReady(true)
-      }, 3000)
+  const menuItems = useTrail(4, {
+    opacity: isMenuOpen ? 1 : 0,
+    height: isMenuOpen ? 1 : 0,
+    y: isMenuOpen ? 0 : -5,
+    config: {
+      delay: 1000
     }
+  })
+
+  useEffect(() => {
+    if (progress < 100) return
+
+    setTimeout(() => {
+      setShowHint(true)
+    }, 1000)
+
+    setTimeout(() => {
+      setShowHint(false)
+    }, 1500)
+
+    setTimeout(() => {
+      setShowHint(true)
+    }, 2500)
+
+    setTimeout(() => {
+      setShowHint(false)
+    }, 3000)
   }, [progress])
+
+  // useEffect(() => {
+  //   if (progress >= 100) {
+  //     setTimeout(() => {
+  //       setIsLoaded(true)
+  //     }, 1000)
+  //     setTimeout(() => {
+  //       setIsReady(true)
+  //     }, 3000)
+  //   }
+  // }, [progress])
 
   return (
     <div className="ui" onClick={started ? null : onStart}>
@@ -76,34 +114,36 @@ export default function Ui({ progress, playingState, onStart, started }) {
       </div> */}
       <div className="center middle">
         <Transition prop={progress < 100}>
-          <a.div className="fs1 ttu ls2 tc">
-            {prog.value.interpolate((d) => `${d.toFixed(0)}%`)}
-          </a.div>
+          <a.div className="fs3 ls2 tc">loading</a.div>
           <a.div
             style={{
               marginTop: 2,
+              marginBottom: 6,
               width: prog.value.interpolate((d) => `${d.toFixed(0)}%`),
               height: 2,
               background: "currentColor"
             }}></a.div>
+          <a.div className="fs6 ttu ls2 tc">
+            {prog.value.interpolate((d) => `${d.toFixed(0)}%`)}
+          </a.div>
         </Transition>
         {/* <Transition prop={isReady && !started} className="fs5 ttu ls5 abs">
           ~ launch ~
         </Transition> */}
-        {/* <Transition prop={started && !playingState} className="fs5 ls3 abs">
-          <div style={{ marginTop: 360 }}>
-            <div className="icon1">⬄</div>
+        <Transition prop={showHint} className="fs5 ls3 abs">
+          <div style={{ marginTop: 320 }}>
+            <ArrowBendUpLeft color=" rgb(234, 112, 255)" size={32} />
+            <ArrowBendUpRight color=" rgb(234, 112, 255)" size={32} />
           </div>
         </Transition>
-        <Transition prop={started && !playingState} className="fs5 ls3 abs">
+        <Transition prop={showHint} className="fs5 ls3 abs">
           <div
             style={{
-              marginLeft: -360,
-              transform: "rotate(90deg)"
+              marginLeft: -320
             }}>
-            <div className="icon1">⬄</div>
+            <ArrowBendLeftUp color=" rgb(234, 112, 255)" size={32} />
           </div>
-        </Transition> */}
+        </Transition>
       </div>
 
       {/* <div className="bottom center fs6 ttu ls3 a3">
@@ -115,10 +155,43 @@ export default function Ui({ progress, playingState, onStart, started }) {
         </Reveal>
       </div> */}
       <div className="abs bottom right">
-        <Reveal height={40} style={trail[3]} className=" fs3 ttu ls1">
-          <Plus color="#fff" weight="thin" size={40} />
-        </Reveal>
+        <Transition
+          height={40}
+          prop={!isMenuOpen}
+          className=" fs3 ttu ls1"
+          onClick={() => {
+            setIsMenuOpen(!isMenuOpen)
+          }}>
+          <Plus color=" rgb(234, 112, 255)" size={40} />
+        </Transition>
       </div>
+      <Transition prop={isMenuOpen} className="ui full">
+        <div>
+          <Reveal height={30} style={menuItems[0]} className="fs2 oh">
+            Spotify
+          </Reveal>
+          <Reveal height={30} style={menuItems[1]} className="fs2 oh">
+            Youtube
+          </Reveal>
+          <Reveal height={30} style={menuItems[2]} className="fs2 oh">
+            Link 1
+          </Reveal>
+          <Reveal height={30} style={menuItems[3]} className="fs2 oh">
+            Link 2
+          </Reveal>
+        </div>
+        <div className="abs bottom right">
+          <Transition
+            height={40}
+            prop={isMenuOpen}
+            className=" fs3 ttu ls1"
+            onClick={() => {
+              setIsMenuOpen(!isMenuOpen)
+            }}>
+            <ArrowUUpLeft color=" rgb(234, 112, 255)" size={40} />
+          </Transition>
+        </div>
+      </Transition>
     </div>
   )
 }

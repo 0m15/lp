@@ -1,24 +1,7 @@
 import lerp from "lerp"
-import React, { useMemo, useRef, useState } from "react"
-import { extend, useFrame, useLoader, useUpdate } from "react-three-fiber"
-import {
-  BackSide,
-  BoxBufferGeometry,
-  ConeBufferGeometry,
-  DodecahedronBufferGeometry,
-  DoubleSide,
-  Float32BufferAttribute,
-  FrontSide,
-  IcosahedronBufferGeometry,
-  MeshBasicMaterial,
-  MeshPhongMaterial,
-  MeshPhysicalMaterial,
-  MeshStandardMaterial,
-  ShaderMaterial,
-  TetrahedronBufferGeometry,
-  TextureLoader,
-  Vector3
-} from "three"
+import React, { useRef } from "react"
+import { useFrame, useLoader } from "react-three-fiber"
+import { TextureLoader, MeshPhongMaterial } from "three"
 import { snoise } from "./shaders/snoise"
 
 export const mat = new MeshPhongMaterial()
@@ -61,80 +44,11 @@ mat.onBeforeCompile = (shader) => {
     #endif
     `
   )
-
-  // shader.fragmentShader = `
-  //   uniform float time;
-  //   uniform vec2 mouse;
-
-  //   ${snoise}
-  //   ${shader.fragmentShader}
-  // `
-
-  // shader.fragmentShader = shader.fragmentShader.replace(
-  //   "#include <map_fragment>",
-  //   `
-  //   #ifdef USE_MAP
-
-  //     float d = 1.0-distance(vUv-vec2(0.5), mouse);
-  //     vec2 offset1 = vec2(-mouse.x, mouse.y) * 0.05;
-
-  //     vec3 bumpM = texture2D(bumpMap, vUv).xyz;
-  //     vec3 norm = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
-  //     vec3 mapN = texture2D( normalMap, vUv+offset1*bumpM.z *d ).xyz * 2.0 - 1.0;
-
-  //     vec4 texelColor = texture2D( map, vUv+offset1 * bumpM.z);
-  //     texelColor = mapTexelToLinear( texelColor );
-  //     diffuseColor *= texelColor;
-  //   #endif
-  //   `
-  // )
-
-  // shader.fragmentShader = shader.fragmentShader.replace(
-  //   "#include <normal_fragment_maps>",
-  //   `
-  //   vec2 offset = vec2(mouse.x, mouse.y) * 0.01;
-
-  //   #ifdef OBJECTSPACE_NORMALMAP
-
-  //   normal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
-
-  //   #ifdef FLIP_SIDED
-  // 	  normal = - normal;
-  //   #endif
-  //   #ifdef DOUBLE_SIDED
-  // 	  normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-  //   #endif
-  //   normal = normalize( normalMatrix * normal );
-  //   #elif defined( TANGENTSPACE_NORMALMAP )
-  //   mapN.xy *= normalScale;
-  //   #ifdef USE_TANGENT
-  //     normal = normalize( vTBN * mapN );
-  //   #else
-  //     normal = perturbNormal2Arb( -vViewPosition, normal, mapN );
-  //   #endif
-  // #elif defined( USE_BUMPMAP )
-  //   normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );
-  // #endif
-
-  // texelColor = vec4(1.0);//texture2D( map, vUv+offset1*normal.z );
-  // texelColor = mapTexelToLinear( texelColor );
-  // diffuseColor *= texelColor;
-  //   `
-  // )
-
   materialShader = shader
-}
-
-export const createMorphGeometry = () => {
-  var geometry = new BoxBufferGeometry(2, 2, 0.01, 32, 32, 32)
-  return geometry
 }
 
 export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
   const mesh = useRef()
-  const geometry = useMemo(() => createMorphGeometry(), [])
-  const [isActive, setActive] = useState(false)
-  const [isHover, setHover] = useState(false)
 
   const [map, normalMap, bumpMap] = useLoader(TextureLoader, [
     "/cover_color.jpg",
@@ -159,34 +73,14 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
       ]
     }
 
-    if (started) {
-      //mesh.current.rotation.y = lerp(mesh.current.rotation.y, -Math.PI, 0.05)
-    } else {
-      //mesh.current.rotation.y += 0.005
-    }
-
     f.current += 1
     i.current = Math.round(((Math.sin(t) + 1) / 2) * 10)
 
     if (t < 2) return
-    //mesh.current.material.opacity = lerp(mesh.current.material.opacity, 1, 0.01)
-    //mesh.current.morphTargetInfluences[1] = (Math.sin(t) + 1) * 0.15
   })
 
   return (
-    <mesh
-      //position={[0, 0, -2]}
-      ref={mesh}
-      //onPointerDown={onPointerDown}
-      // onPointerOver={() => {
-      //   setHover(true)
-      // }}
-      // onPointerOut={() => {
-      //   if (started) return
-      //   setHover(false)
-      // }}
-      {...props}>
-      {/* <primitive object={geometry} attach="geometry" /> */}
+    <mesh ref={mesh} {...props}>
       <boxBufferGeometry args={[1, 1, 0.02, 128, 128, 128]} attach="geometry" />
       <primitive
         object={mat}
@@ -198,10 +92,7 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
         displacementScale={0}
         bumpScale={0}
         specularColor="darkgray"
-        // displacementBias={-0.1}
-        // displacementScale={0.1}
       />
-      {/* <customMaterial attach="material" map={map} morphTargets /> */}
     </mesh>
   )
 }
