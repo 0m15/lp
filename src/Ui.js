@@ -167,17 +167,17 @@ export default function Ui({ progress, playingState, onStart, started }) {
       </div>
       <Transition prop={isMenuOpen} className="ui full">
         <div>
-          <Reveal height={30} style={menuItems[0]} className="fs2 oh">
-            Spotify
+          <Reveal height={30} style={menuItems[0]} className="fs2 mb oh">
+            spotify
           </Reveal>
-          <Reveal height={30} style={menuItems[1]} className="fs2 oh">
-            Youtube
+          <Reveal height={30} style={menuItems[1]} className="fs2 mb oh">
+            youtube
           </Reveal>
-          <Reveal height={30} style={menuItems[2]} className="fs2 oh">
-            Link 1
+          <Reveal height={30} style={menuItems[2]} className="fs2 mb oh">
+            link 1
           </Reveal>
-          <Reveal height={30} style={menuItems[3]} className="fs2 oh">
-            Link 2
+          <Reveal height={30} style={menuItems[3]} className="fs2 mb oh">
+            link 2
           </Reveal>
         </div>
         <div className="abs bottom right">

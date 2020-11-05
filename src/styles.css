@@ -190,6 +190,9 @@ body {
   margin-top: auto;
   margin-bottom: auto;
 }
+.mb {
+  margin-bottom: 0.5rem;
+}
 
 .center {
   /* left: 50%; */
