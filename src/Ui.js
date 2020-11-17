@@ -11,6 +11,7 @@ import {
   ArrowUUpRight,
   Plus
 } from "phosphor-react"
+import { useThree } from "react-three-fiber"
 
 function Transition({
   prop,
@@ -57,13 +58,13 @@ export default function Ui({ progress, playingState, onStart, started }) {
     value: progress
   })
 
-  const trail = useTrail(4, {
-    opacity: started ? 1 : 0,
-    height: started ? 1 : 0,
-    config: {
-      duration: 1200
-    }
-  })
+  // const trail = useTrail(4, {
+  //   opacity: started ? 1 : 0,
+  //   height: started ? 1 : 0,
+  //   config: {
+  //     duration: 1200
+  //   }
+  // })
 
   const menuItems = useTrail(4, {
     opacity: isMenuOpen ? 1 : 0,
@@ -94,24 +95,8 @@ export default function Ui({ progress, playingState, onStart, started }) {
     }, 3000)
   }, [progress])
 
-  // useEffect(() => {
-  //   if (progress >= 100) {
-  //     setTimeout(() => {
-  //       setIsLoaded(true)
-  //     }, 1000)
-  //     setTimeout(() => {
-  //       setIsReady(true)
-  //     }, 3000)
-  //   }
-  // }, [progress])
-
   return (
     <div className="ui" onClick={started ? null : onStart}>
-      {/* <div className="top center">
-        <Reveal height={30} style={trail[0]} className="fs2 ttu oh">
-          band name
-        </Reveal>
-      </div> */}
       <div className="center middle">
         <Transition prop={progress < 100}>
           <a.div className="fs3 ls2 tc">loading</a.div>
@@ -127,9 +112,6 @@ export default function Ui({ progress, playingState, onStart, started }) {
             {prog.value.interpolate((d) => `${d.toFixed(0)}%`)}
           </a.div>
         </Transition>
-        {/* <Transition prop={isReady && !started} className="fs5 ttu ls5 abs">
-          ~ launch ~
-        </Transition> */}
         <Transition prop={showHint} className="fs5 ls3 abs">
           <div style={{ marginTop: 320 }}>
             <ArrowBendUpLeft color=" rgb(234, 112, 255)" size={32} />
@@ -144,16 +126,8 @@ export default function Ui({ progress, playingState, onStart, started }) {
             <ArrowBendLeftUp color=" rgb(234, 112, 255)" size={32} />
           </div>
         </Transition>
+        <Transition prop={progress >= 100} className="abs fs5"></Transition>
       </div>
-
-      {/* <div className="bottom center fs6 ttu ls3 a3">
-        &copy; 2020 dna records
-      </div> */}
-      {/* <div className="bottom center">
-        <Reveal height={30} style={trail[2]} className="tc fs3 ttu ls1">
-          album name
-        </Reveal>
-      </div> */}
       <div className="abs bottom right">
         <Transition
           height={40}

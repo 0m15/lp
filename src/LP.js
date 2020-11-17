@@ -6,6 +6,7 @@ import MorphMesh from "./MorphMesh"
 import { useDrag } from "react-use-gesture"
 import { useSpring, a } from "@react-spring/three"
 import Background from "./Background"
+import useStore from "./store"
 
 extend({ VideoMaterial })
 
@@ -39,11 +40,15 @@ const LP = forwardRef(
     group
   ) => {
     const vinyl = useRef()
+    const { side, setSide } = useStore((state) => ({
+      side: state.side,
+      setSide: state.setSide
+    }))
 
     const [rotate, setRotation] = useSpring(() => ({
-      y: 1,
+      y: 0,
       from: {
-        y: 0
+        y: 1
       },
       reset: true
     }))
@@ -91,7 +96,9 @@ const LP = forwardRef(
 
         if (!down && trigger) {
           setRotation({ y: rotateY })
+          setSide(side === "A" ? "B" : "A")
           lastRotation.current = rotateY
+          console.log({ rotateY })
         } else if (!down) {
           setRotation({ y: lastRotation.current })
         } else {

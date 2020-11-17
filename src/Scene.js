@@ -6,6 +6,8 @@ import { useFrame, useThree } from "react-three-fiber"
 import { Vector3 } from "three"
 import LP from "./LP"
 import useAccelerometer from "./MotionSensor"
+import Player from "./Player"
+import useStore from "./store"
 
 const zoomIn = new Vector3(0, 0, 5)
 const zoomIn2 = new Vector3(0, 0, 3)
@@ -41,6 +43,9 @@ export default function Scene() {
   const [state, setState] = useState(STATES.IDLE)
   const { size, mouse: _mouse } = useThree()
   const { progress } = useProgress()
+  const side = useStore((state) => state.side)
+
+  console.log({ side })
 
   useFrame(({ camera }) => {
     input.current[0] = _mouse.x
@@ -71,6 +76,7 @@ export default function Scene() {
             setPlayingState(false)
           }}
         />
+        <Player side={side} isPlaying={playingState} />
       </Suspense>
       <Html fullscreen>
         <Ui
