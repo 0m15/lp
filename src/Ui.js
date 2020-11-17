@@ -97,21 +97,21 @@ export default function Ui({ progress, playingState, onStart, started }) {
 
   return (
     <div className="ui" onClick={started ? null : onStart}>
+      <Transition prop={progress < 100} className="center middle loader full">
+        <a.div className="fs3 ls2 tc">loading</a.div>
+        <a.div
+          style={{
+            marginTop: 2,
+            marginBottom: 6,
+            width: prog.value.interpolate((d) => `${d.toFixed(0)}%`),
+            height: 2,
+            background: "currentColor"
+          }}></a.div>
+        <a.div className="fs6 ttu ls2 tc">
+          {prog.value.interpolate((d) => `${d.toFixed(0)}%`)}
+        </a.div>
+      </Transition>
       <div className="center middle">
-        <Transition prop={progress < 100}>
-          <a.div className="fs3 ls2 tc">loading</a.div>
-          <a.div
-            style={{
-              marginTop: 2,
-              marginBottom: 6,
-              width: prog.value.interpolate((d) => `${d.toFixed(0)}%`),
-              height: 2,
-              background: "currentColor"
-            }}></a.div>
-          <a.div className="fs6 ttu ls2 tc">
-            {prog.value.interpolate((d) => `${d.toFixed(0)}%`)}
-          </a.div>
-        </Transition>
         <Transition prop={showHint} className="fs5 ls3 abs">
           <div style={{ marginTop: 320 }}>
             <ArrowBendUpLeft color=" rgb(234, 112, 255)" size={32} />
@@ -126,8 +126,8 @@ export default function Ui({ progress, playingState, onStart, started }) {
             <ArrowBendLeftUp color=" rgb(234, 112, 255)" size={32} />
           </div>
         </Transition>
-        <Transition prop={progress >= 100} className="abs fs5"></Transition>
       </div>
+      <Transition prop={progress >= 100} className="abs fs5"></Transition>
       <div className="abs bottom right">
         <Transition
           height={40}

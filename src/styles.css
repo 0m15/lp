@@ -211,3 +211,7 @@ div.full {
   box-sizing: border-box;
   background: rgba(0, 0, 0, 0.9);
 }
+
+.loader {
+  background: rgba(0, 0, 0, 0.9);
+}

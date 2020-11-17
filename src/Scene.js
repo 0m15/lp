@@ -10,13 +10,6 @@ import Player from "./Player"
 import useStore from "./store"
 
 const zoomIn = new Vector3(0, 0, 5)
-const zoomIn2 = new Vector3(0, 0, 3)
-
-const STATES = {
-  0: "IDLE",
-  1: "STARTED",
-  2: "PLAYING"
-}
 
 function ZoomIn({ to = zoomIn } = {}) {
   useFrame(({ camera }) => {
@@ -40,12 +33,9 @@ export default function Scene() {
   const lp = useRef()
   const [playingState, setPlayingState] = useState(false)
   const [started, setStarted] = useState(true)
-  const [state, setState] = useState(STATES.IDLE)
   const { size, mouse: _mouse } = useThree()
   const { progress } = useProgress()
   const side = useStore((state) => state.side)
-
-  console.log({ side })
 
   useFrame(({ camera }) => {
     input.current[0] = _mouse.x
@@ -64,6 +54,7 @@ export default function Scene() {
       <color attach="background" args={["#111"]} />
       <Suspense fallback={null}>
         <LP
+          progress={progress}
           started={started}
           playingState={playingState}
           ref={lp}
