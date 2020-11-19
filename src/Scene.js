@@ -68,7 +68,7 @@ export default function Scene() {
           }}
         />
       </Suspense>
-      <Player side={side} isPlaying={playingState} />
+      <Player side={side} isPlaying={!playingState} />
       <Html fullscreen>
         <Ui
           progress={progress}

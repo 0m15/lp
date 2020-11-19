@@ -16,9 +16,6 @@ const trackB = new Audio(listener)
 const fftSize = 512
 
 export default function Player({ side = "A", dataTexture, isPlaying = false }) {
-  const [bufferA, setBufferA] = useState(null)
-  const [bufferB, setBufferB] = useState(null)
-
   useEffect(() => {
     loader.load("/niente-192.mp3", (buffer) => {
       trackA.setBuffer(buffer)
@@ -33,24 +30,33 @@ export default function Player({ side = "A", dataTexture, isPlaying = false }) {
   }, [])
 
   useEffect(() => {
-    if (!trackA) return
+    const onTouch = () => {
+      console.log({ isPlaying })
+      if (isPlaying) {
+        if (side === "A") {
+          //trackB.hasPlaybackControl && trackB.stop()
+          if (trackB.isPlaying && trackB.hasPlaybackControl) trackB.stop()
+          trackA.play()
+        } else {
+          //trackA.hasPlaybackControl && trackA.stop()
 
-    if (isPlaying) {
-      if (side === "A") {
-        //trackB.hasPlaybackControl && trackB.stop()
-        if (trackB.isPlaying && trackB.hasPlaybackControl) trackB.stop()
-        trackA.play()
+          if (trackA.isPlaying && trackA.hasPlaybackControl) trackA.stop()
+          trackB.play()
+        }
       } else {
-        //trackA.hasPlaybackControl && trackA.stop()
-
-        if (trackA.isPlaying && trackA.hasPlaybackControl) trackA.stop()
-        trackB.play()
+        trackA.isPlaying && trackA.hasPlaybackControl && trackA.stop()
+        trackB.isPlaying && trackB.hasPlaybackControl && trackB.stop()
       }
-    } else {
-      trackA.isPlaying && trackA.hasPlaybackControl && trackA.stop()
-      trackB.isPlaying && trackB.hasPlaybackControl && trackB.stop()
     }
-  }, [isPlaying, side])
+
+    window.addEventListener("touchstart", onTouch)
+    window.addEventListener("click", onTouch)
+
+    return () => {
+      window.removeEventListener("touchstart", onTouch)
+      window.removeEventListener("click", onTouch)
+    }
+  }, [isPlaying])
 
   return null
 }
