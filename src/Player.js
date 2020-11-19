@@ -10,6 +10,8 @@ import {
 
 const listener = new AudioListener()
 const loader = new AudioLoader()
+const trackDummy = new Audio(listener)
+
 const trackA = new Audio(listener)
 const trackB = new Audio(listener)
 
@@ -21,10 +23,10 @@ export default function Player({ side = "A", dataTexture, isPlaying = false }) {
     // create empty buffer
     window.addEventListener("touchstart", () => {
       if (isUnlocked) return
-      var buffer = trackA.context.createBuffer(1, 1, 22050)
-      var source = trackA.context.createBufferSource()
+      var buffer = trackDummy.context.createBuffer(1, 1, 22050)
+      var source = trackDummy.context.createBufferSource()
       source.buffer = buffer
-      source.connect(trackA.context.destination)
+      source.connect(trackDummy.context.destination)
       source.start(0)
 
       // by checking the play state after some time, we know if we're really unlocked
