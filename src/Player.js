@@ -8,39 +8,49 @@ import {
   DataTexture
 } from "three"
 
+const listener = new AudioListener()
 const loader = new AudioLoader()
+const trackA = new Audio(listener)
+const trackB = new Audio(listener)
+
 const fftSize = 512
 
 export default function Player({ side = "A", dataTexture, isPlaying = false }) {
-  const { camera } = useThree()
-
-  const [audio, analyser] = useMemo(() => {
-    const listener = new AudioListener()
-    const audio = new Audio(listener)
-    return [audio, new AudioAnalyser(audio, fftSize)]
-  }, [camera])
+  const [bufferA, setBufferA] = useState(null)
+  const [bufferB, setBufferB] = useState(null)
 
   useEffect(() => {
-    loader.load(side === "A" ? "/niente-192.mp3" : "/due-192.mp3", (buffer) => {
-      audio.setBuffer(buffer)
-      audio.setLoop(false)
-      audio.setVolume(0.9)
-      if (audio.isPlaying) {
-        audio.stop()
-        audio.play()
-      }
+    loader.load("/niente-192.mp3", (buffer) => {
+      trackA.setBuffer(buffer)
+      trackA.setLoop(false)
+      trackA.setVolume(0.9)
     })
-  }, [audio, side])
+    loader.load("/due-192.mp3", (buffer) => {
+      trackB.setBuffer(buffer)
+      trackB.setLoop(false)
+      trackB.setVolume(0.9)
+    })
+  }, [])
 
   useEffect(() => {
-    if (!audio) return
+    if (!trackA) return
 
-    if (isPlaying && audio.hasPlaybackControl) {
-      audio.play()
-    } else if (audio.isPlaying) {
-      audio.stop()
+    if (isPlaying) {
+      if (side === "A") {
+        //trackB.hasPlaybackControl && trackB.stop()
+        if (trackB.isPlaying && trackB.hasPlaybackControl) trackB.stop()
+        trackA.play()
+      } else {
+        //trackA.hasPlaybackControl && trackA.stop()
+
+        if (trackA.isPlaying && trackA.hasPlaybackControl) trackA.stop()
+        trackB.play()
+      }
+    } else {
+      trackA.isPlaying && trackA.hasPlaybackControl && trackA.stop()
+      trackB.isPlaying && trackB.hasPlaybackControl && trackB.stop()
     }
-  }, [isPlaying, audio])
+  }, [isPlaying, side])
 
   return null
 }
