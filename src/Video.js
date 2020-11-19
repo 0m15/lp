@@ -15,7 +15,7 @@ export default function Video({ playingState, ...props }) {
     const video = document.getElementById("video")
 
     const onClick = () => {
-      if (!playingState) {
+      if (playingState) {
         video.play()
       } else {
         video.pause()
