@@ -14,16 +14,28 @@ const trackA = new Audio(listener)
 const trackB = new Audio(listener)
 
 const fftSize = 512
+let isUnlocked = false
 
 export default function Player({ side = "A", dataTexture, isPlaying = false }) {
   useEffect(() => {
     // create empty buffer
     window.addEventListener("touchstart", () => {
+      if (isUnlocked) return
       var buffer = trackA.context.createBuffer(1, 1, 22050)
       var source = trackA.context.createBufferSource()
       source.buffer = buffer
       source.connect(trackA.context.destination)
       source.start(0)
+
+      // by checking the play state after some time, we know if we're really unlocked
+      setTimeout(function () {
+        if (
+          source.playbackState === source.PLAYING_STATE ||
+          source.playbackState === source.FINISHED_STATE
+        ) {
+          isUnlocked = true
+        }
+      }, 0)
     })
 
     loader.load("/niente-192.mp3", (buffer) => {
