@@ -1,4 +1,4 @@
-import React, { Suspense, useRef, useState } from "react"
+import React, { Suspense, useCallback, useRef, useState } from "react"
 import Background from "./Background"
 import { Html, useProgress } from "drei"
 import Ui from "./Ui"
@@ -32,7 +32,7 @@ export default function Scene() {
   })
 
   const lp = useRef()
-  const [playingState, setPlayingState] = useState(false)
+  const [playingState, setPlayingState] = useState(0)
   const [started, setStarted] = useState(true)
   const { size, mouse: _mouse } = useThree()
   const { progress } = useProgress()
@@ -47,6 +47,22 @@ export default function Scene() {
     // camera.lookAt(lookAt)
   })
 
+  const onStart = useCallback(() => {
+    setPlayingState(1)
+  }, [])
+  const onStop = useCallback(() => {
+    setPlayingState(0)
+  }, [])
+  const onPlay = useCallback(() => {
+    setPlayingState(2)
+  }, [])
+  const onPlayVideo = useCallback(() => {
+    console.log("xxx")
+    setPlayingState(3)
+  }, [])
+  const onPause = useCallback(() => {
+    setPlayingState(1)
+  }, [])
   return (
     <>
       <color attach="background" args={["white"]} />
@@ -61,18 +77,11 @@ export default function Scene() {
           ref={lp}
           mouse={input.current}
           position={[0, 0, 0]}
-          onStart={() => {
-            setPlayingState(1)
-          }}
-          onStop={() => {
-            setPlayingState(0)
-          }}
-          onPlay={() => {
-            setPlayingState(2)
-          }}
-          onPause={() => {
-            setPlayingState(1)
-          }}
+          onStart={onStart}
+          onStop={onStop}
+          onPlay={onPlay}
+          onPause={onPause}
+          onPlayVideo={onPlayVideo}
         />
       </Suspense>
       <Player

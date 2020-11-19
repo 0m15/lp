@@ -19,11 +19,12 @@ import BackgroundMaterial from "./shaders/Background"
 
 extend({ BackgroundMaterial })
 
-const videoTexture = new VideoTexture(document.getElementById("video"))
+const video = document.getElementById("video")
+const videoTexture = new VideoTexture(video)
 videoTexture.wrapS = MirroredRepeatWrapping
 videoTexture.wrapT = MirroredRepeatWrapping
 
-export default function Background({ mouse, started, playingState, ...props }) {
+export default function Background({ mouse, playingState, ...props }) {
   const mesh = useRef()
   const { size, viewport } = useThree()
   const scale = useAspect("cover", size.width, size.height, 1)
@@ -41,19 +42,17 @@ export default function Background({ mouse, started, playingState, ...props }) {
   }, [map, noise])
 
   useEffect(() => {
-    const video = document.getElementById("video")
-
-    const onClick = () => {
-      if (!playingState) {
-        video.play()
-      } else {
-        video.pause()
-      }
+    //const onClick = () => {
+    if (playingState) {
+      video.play()
+    } else {
+      video.pause()
     }
-    document.addEventListener("click", onClick)
+    //}
+    // document.addEventListener("click", onClick)
 
     return () => {
-      document.removeEventListener("click", onClick)
+      // document.removeEventListener("click", onClick)
     }
   }, [playingState])
 

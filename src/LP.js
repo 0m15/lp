@@ -35,6 +35,7 @@ const LP = forwardRef(
       started,
       onStart = () => {},
       onPlay = () => {},
+      onPlayVideo = () => {},
       onPause = () => {},
       onStop = () => {},
       ...props
@@ -42,6 +43,7 @@ const LP = forwardRef(
     group
   ) => {
     const vinyl = useRef()
+
     const { side, setSide } = useStore((state) => ({
       side: state.side,
       setSide: state.setSide
@@ -75,18 +77,21 @@ const LP = forwardRef(
         velocity,
         tap
       }) => {
-        // detect tap only
+        // tap on cover and vinyl
         if (tap) {
-          if (playingState === 1) {
+          if (playingState === 0) {
+            onPlayVideo()
+          } else if (playingState === 1) {
             onPlay()
           } else if (playingState === 2) {
             onPause()
+          } else {
+            onStop()
           }
           return
         }
 
-        if (playingState === 2) return
-
+        // swipe handling
         let dy = my / window.innerHeight
         let dx = (mx / window.innerWidth) * 2
         const trigger = velocity > 0.4 || Math.abs(dx) > 0.6
@@ -95,6 +100,7 @@ const LP = forwardRef(
           xDir > 0 ? lastRotation.current + 1 : lastRotation.current - 1
         const offsetY = yDir > 0 ? 0 : 0.5
 
+        // swipe up/down
         if (axis === "y") {
           if (!down && trigger) {
             offsetY ? onStart() : onStop()
@@ -112,6 +118,10 @@ const LP = forwardRef(
           return
         }
 
+        // already playing track or video
+        if (playingState >= 2) return
+
+        // swipe left/right
         if (!down && trigger) {
           setRotation({ y: rotateY })
           setSide(side === "A" ? "B" : "A")
@@ -145,12 +155,11 @@ const LP = forwardRef(
           <MorphMesh mouse={mouse} started={started} />
         </a.group>
         <a.group
-          position-z={offset.y.to((d) => d * 0.1)}
+          // position-z={offset.y.to((d) => d * 0.1)}
           position-y={offset.y.to((d) => -d * 1.5)}>
           <Background
-            started={true}
-            playingState={playingState === 2}
-            position={[0, 0.01, 0]}
+            playingState={playingState === 3}
+            position={[0, 0, 0.05]}
           />
         </a.group>
       </>
