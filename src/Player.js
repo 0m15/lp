@@ -70,6 +70,7 @@ export default function Player({ side = "A", dataTexture, isPlaying = false }) {
   useEffect(() => {
     const audio = document.getElementById("trackA")
 
+    console.log({ isPlaying })
     const onClick = () => {
       if (isPlaying) {
         audio.play()
@@ -79,9 +80,11 @@ export default function Player({ side = "A", dataTexture, isPlaying = false }) {
       }
     }
     document.addEventListener("click", onClick)
+    // document.addEventListener("mousedown", onClick)
 
     return () => {
       document.removeEventListener("click", onClick)
+      // document.removeEventListener("mousedown", onClick)
     }
   }, [isPlaying])
 
