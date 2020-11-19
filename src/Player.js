@@ -40,12 +40,6 @@ export default function Player({ side = "A", dataTexture, isPlaying = false }) {
   }, [])
 
   useEffect(() => {
-    window.addEventListener("click", unlock)
-
-    function unlock() {}
-  }, [])
-
-  useEffect(() => {
     if (isPlaying) {
       if (side === "A") {
         //trackB.hasPlaybackControl && trackB.stop()

@@ -33,6 +33,7 @@ const LP = forwardRef(
       mouse,
       playingState,
       started,
+      onStart = () => {},
       onPlay = () => {},
       onPause = () => {},
       ...props
@@ -83,7 +84,7 @@ const LP = forwardRef(
 
         if (axis === "y") {
           if (!down && trigger) {
-            offsetY ? onPlay() : onPause()
+            offsetY ? onStart() : onPause()
             setOffset({ y: offsetY })
             lastOffset.current = offsetY
           } else if (!down) {
@@ -112,7 +113,7 @@ const LP = forwardRef(
     )
 
     useFrame(() => {
-      if (playingState) {
+      if (playingState === 2) {
         vinyl.current.rotation.z -= 0.01
       }
     })
@@ -123,7 +124,13 @@ const LP = forwardRef(
           ref={group}
           {...props}
           rotation-y={rotate.y.to((d) => d * Math.PI)}>
-          <Vinyl position-y={offset.y.to((d) => d)} ref={vinyl} />
+          <Vinyl
+            onPointerDown={() => {
+              onPlay()
+            }}
+            position-y={offset.y.to((d) => d)}
+            ref={vinyl}
+          />
           <MorphMesh mouse={mouse} started={started} />
         </a.group>
         <a.group position-z={offset.y.to((d) => d)}>

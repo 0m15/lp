@@ -20,6 +20,7 @@ function ZoomIn({ to = zoomIn } = {}) {
 }
 
 const lookAt = new Vector3(0, 0, 0)
+
 export default function Scene() {
   const input = useRef([0, 0, 0])
 
@@ -60,15 +61,22 @@ export default function Scene() {
           ref={lp}
           mouse={input.current}
           position={[0, 0, 0]}
+          onStart={() => {
+            setPlayingState(1)
+          }}
           onPlay={() => {
-            setPlayingState(true)
+            setPlayingState(2)
           }}
           onPause={() => {
-            setPlayingState(false)
+            setPlayingState(0)
           }}
         />
       </Suspense>
-      <Player side={side} isPlaying={playingState} />
+      <Player
+        side={side}
+        isPlaying={playingState === 2}
+        isStarted={playingState === 1}
+      />
       <Html fullscreen>
         <Ui
           progress={progress}
