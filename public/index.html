@@ -246,10 +246,6 @@
       <source src="/video.mp4" type="video/mp4" />
     </video>
 
-    <audio id="dummy">
-      Il tuo browser non supporta l'elemento <code>audio</code>.
-    </audio>
-
     <audio src="/niente-192.mp3" id="trackA">
       Il tuo browser non supporta l'elemento <code>audio</code>.
     </audio>
@@ -260,13 +256,14 @@
 
     <script>
       let isUnlocked = false
-      let dummy = document.getElementById("dummy")
+      let context = new AudioContext()
+
       window.addEventListener("click", () => {
         if (isUnlocked) return
-        var buffer = dummy.context.createBuffer(1, 1, 22050)
-        var source = dummy.context.createBufferSource()
+        var buffer = context.createBuffer(1, 1, 22050)
+        var source = context.createBufferSource()
         source.buffer = buffer
-        source.connect(dummy.context.destination)
+        source.connect(context.destination)
         source.start(0)
 
         // by checking the play state after some time, we know if we're really unlocked
