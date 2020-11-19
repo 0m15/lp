@@ -71,11 +71,23 @@ const LP = forwardRef(
         movement: [mx, my],
         direction: [xDir, yDir],
         axis,
-        velocity
+        velocity,
+        tap
       }) => {
+        // detect tap only
+        if (tap) {
+          if (playingState === 1) {
+            onPlay()
+          } else {
+            onPause()
+          }
+          return
+        }
+
+        if (playingState === 2) return
+
         let dy = my / window.innerHeight
         let dx = (mx / window.innerWidth) * 2
-
         const trigger = velocity > 0.4 || Math.abs(dx) > 0.6
 
         const rotateY =
@@ -90,7 +102,11 @@ const LP = forwardRef(
           } else if (!down) {
             setOffset({ y: lastOffset.current })
           } else {
-            setOffset({ y: lastOffset.current - dy })
+            setOffset({
+              y: lastOffset.current - dy,
+              bounds: { top: 0.01, bottom: 0.01, left: 0, right: 0 },
+              rubberband: true
+            })
           }
           return
         }
@@ -99,7 +115,6 @@ const LP = forwardRef(
           setRotation({ y: rotateY })
           setSide(side === "A" ? "B" : "A")
           lastRotation.current = rotateY
-          console.log({ rotateY })
         } else if (!down) {
           setRotation({ y: lastRotation.current })
         } else {
@@ -114,7 +129,7 @@ const LP = forwardRef(
 
     useFrame(() => {
       if (playingState === 2) {
-        vinyl.current.rotation.z -= 0.01
+        vinyl.current.rotation.z -= side === "A" ? 0.015 : -0.015
       }
     })
 
@@ -126,14 +141,14 @@ const LP = forwardRef(
           rotation-y={rotate.y.to((d) => d * Math.PI)}
           position-y={offset.y.to((d) => -d * 1.5)}>
           <Vinyl
-            onPointerDown={() => {
-              if (playingState === 2) {
-                setOffset({ y: 0 })
-                onPause()
-              } else if (playingState === 1) {
-                onPlay()
-              }
-            }}
+            // onPointerDown={() => {
+            //   if (playingState === 2) {
+            //     //setOffset({ y: 0 })
+            //     onPause()
+            //   } else if (playingState === 1) {
+            //     onPlay()
+            //   }
+            // }}
             position-y={offset.y.to((d) => d * 2)}
             ref={vinyl}
           />
@@ -145,7 +160,7 @@ const LP = forwardRef(
           <Background
             started={true}
             playingState={playingState === 2}
-            position={[0, 0, 0]}
+            position={[0, 0.01, 0]}
           />
         </a.group>
       </>

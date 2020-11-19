@@ -64,17 +64,20 @@ export default function Scene() {
           onStart={() => {
             setPlayingState(1)
           }}
+          onStop={() => {
+            setPlayingState(0)
+          }}
           onPlay={() => {
             setPlayingState(2)
           }}
           onPause={() => {
-            setPlayingState(0)
+            setPlayingState(1)
           }}
         />
       </Suspense>
       <Player
         side={side}
-        isPlaying={playingState === 2}
+        isPlaying={playingState}
         isStarted={playingState === 1}
       />
       <Html fullscreen>

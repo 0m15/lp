@@ -246,6 +246,10 @@
       <source src="/video.mp4" type="video/mp4" />
     </video>
 
+    <audio id="dummy">
+      Il tuo browser non supporta l'elemento <code>audio</code>.
+    </audio>
+
     <audio src="/niente-192.mp3" id="trackA">
       Il tuo browser non supporta l'elemento <code>audio</code>.
     </audio>
@@ -253,15 +257,28 @@
     <audio src="/due-192.mp3" id="trackB">
       Il tuo browser non supporta l'elemento <code>audio</code>.
     </audio>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    <script>
+      let isUnlocked = false
+      let dummy = document.getElementById("dummy")
+      window.addEventListener("click", () => {
+        if (isUnlocked) return
+        var buffer = dummy.context.createBuffer(1, 1, 22050)
+        var source = dummy.context.createBufferSource()
+        source.buffer = buffer
+        source.connect(dummy.context.destination)
+        source.start(0)
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+        // by checking the play state after some time, we know if we're really unlocked
+        setTimeout(function () {
+          if (
+            source.playbackState === source.PLAYING_STATE ||
+            source.playbackState === source.FINISHED_STATE
+          ) {
+            isUnlocked = true
+          }
+        }, 0)
+      })
+    </script>
   </body>
 </html>
