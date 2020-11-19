@@ -63,7 +63,7 @@ export default function Player({ side = "A", dataTexture, isPlaying = false }) {
       trackA.isPlaying && trackA.hasPlaybackControl && trackA.stop()
       trackB.isPlaying && trackB.hasPlaybackControl && trackB.stop()
     }
-  }, [isPlaying])
+  }, [side, isPlaying])
 
   return null
 }
