@@ -123,20 +123,28 @@ const LP = forwardRef(
         <a.group
           ref={group}
           {...props}
-          rotation-y={rotate.y.to((d) => d * Math.PI)}>
+          rotation-y={rotate.y.to((d) => d * Math.PI)}
+          position-y={offset.y.to((d) => -d * 1.5)}>
           <Vinyl
             onPointerDown={() => {
-              onPlay()
+              if (playingState === 2) {
+                setOffset({ y: 0 })
+                onPause()
+              } else if (playingState === 1) {
+                onPlay()
+              }
             }}
-            position-y={offset.y.to((d) => d)}
+            position-y={offset.y.to((d) => d * 2)}
             ref={vinyl}
           />
           <MorphMesh mouse={mouse} started={started} />
         </a.group>
-        <a.group position-z={offset.y.to((d) => d)}>
+        <a.group
+          position-z={offset.y.to((d) => d * 0.1)}
+          position-y={offset.y.to((d) => -d * 1.5)}>
           <Background
             started={true}
-            playingState={playingState}
+            playingState={playingState === 2}
             position={[0, 0, 0]}
           />
         </a.group>
