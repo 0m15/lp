@@ -17,6 +17,16 @@ const fftSize = 512
 
 export default function Player({ side = "A", dataTexture, isPlaying = false }) {
   useEffect(() => {
+    // create empty buffer
+    var buffer = trackA.context.createBuffer(1, 1, 22050)
+
+    window.addEventListener("click", () => {
+      var source = trackA.context.createBufferSource()
+      source.buffer = buffer
+      source.connect(trackA.context.destination)
+      source.start(0)
+    })
+
     loader.load("/niente-192.mp3", (buffer) => {
       trackA.setBuffer(buffer)
       trackA.setLoop(false)
@@ -30,31 +40,26 @@ export default function Player({ side = "A", dataTexture, isPlaying = false }) {
   }, [])
 
   useEffect(() => {
-    const onTouch = () => {
-      console.log({ isPlaying })
-      if (isPlaying) {
-        if (side === "A") {
-          //trackB.hasPlaybackControl && trackB.stop()
-          if (trackB.isPlaying && trackB.hasPlaybackControl) trackB.stop()
-          trackA.play()
-        } else {
-          //trackA.hasPlaybackControl && trackA.stop()
+    window.addEventListener("click", unlock)
 
-          if (trackA.isPlaying && trackA.hasPlaybackControl) trackA.stop()
-          trackB.play()
-        }
+    function unlock() {}
+  }, [])
+
+  useEffect(() => {
+    if (isPlaying) {
+      if (side === "A") {
+        //trackB.hasPlaybackControl && trackB.stop()
+        if (trackB.isPlaying && trackB.hasPlaybackControl) trackB.stop()
+        trackA.play()
       } else {
-        trackA.isPlaying && trackA.hasPlaybackControl && trackA.stop()
-        trackB.isPlaying && trackB.hasPlaybackControl && trackB.stop()
+        //trackA.hasPlaybackControl && trackA.stop()
+
+        if (trackA.isPlaying && trackA.hasPlaybackControl) trackA.stop()
+        trackB.play()
       }
-    }
-
-    window.addEventListener("touchstart", onTouch)
-    window.addEventListener("click", onTouch)
-
-    return () => {
-      window.removeEventListener("touchstart", onTouch)
-      window.removeEventListener("click", onTouch)
+    } else {
+      trackA.isPlaying && trackA.hasPlaybackControl && trackA.stop()
+      trackB.isPlaying && trackB.hasPlaybackControl && trackB.stop()
     }
   }, [isPlaying])
 
