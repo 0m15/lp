@@ -18,9 +18,8 @@ const fftSize = 512
 export default function Player({ side = "A", dataTexture, isPlaying = false }) {
   useEffect(() => {
     // create empty buffer
-    var buffer = trackA.context.createBuffer(1, 1, 22050)
-
-    window.addEventListener("click", () => {
+    window.addEventListener("touchstart", () => {
+      var buffer = trackA.context.createBuffer(1, 1, 22050)
       var source = trackA.context.createBufferSource()
       source.buffer = buffer
       source.connect(trackA.context.destination)
@@ -42,12 +41,9 @@ export default function Player({ side = "A", dataTexture, isPlaying = false }) {
   useEffect(() => {
     if (isPlaying) {
       if (side === "A") {
-        //trackB.hasPlaybackControl && trackB.stop()
         if (trackB.isPlaying && trackB.hasPlaybackControl) trackB.stop()
         trackA.play()
       } else {
-        //trackA.hasPlaybackControl && trackA.stop()
-
         if (trackA.isPlaying && trackA.hasPlaybackControl) trackA.stop()
         trackB.play()
       }
