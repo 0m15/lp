@@ -150,11 +150,17 @@ const LP = forwardRef(
 
     return (
       <group
+        {...props}
         scale={[Math.min(1.5, scale), Math.min(1.5, scale), 1]}
         {...bind()}>
+        <group scale={[scale, Math.min(1.25, scale), 1]}>
+          <mesh>
+            <planeBufferGeometry args={[1, 1, 1]} />
+            <meshBasicMaterial transparent opacity={0} />
+          </mesh>
+        </group>
         <a.group
           ref={group}
-          {...props}
           rotation-y={rotate.y.to((d) => d * Math.PI)}
           position-y={offset.y.to((d) => -d * 1.5)}>
           <Vinyl position-y={offset.y.to((d) => d * 2)} ref={vinyl} />

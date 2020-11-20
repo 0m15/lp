@@ -98,10 +98,10 @@ export default function Ui({ progress, hintVisibility }) {
       <div className="center middle">
         <Hint state={hintVisibility} native>
           {(styles) => (
-            <animated.div style={{ marginTop: 320, ...styles }}>
+            <animated.div style={{ marginTop: 480, ...styles }}>
               <ArrowLeft color=" rgb(234, 112, 255)" size={20} />
               <ArrowRight color=" rgb(234, 112, 255)" size={20} />
-              <div className="ls4">swipe</div>
+              <div className="ls5">swipe/scroll</div>
             </animated.div>
           )}
         </Hint>
