@@ -98,7 +98,10 @@ const LP = forwardRef(
         // swipe handling
         let dy = my / window.innerHeight
         let dx = (mx / window.innerWidth) * 2
-        const trigger = velocity > 0.4 || Math.abs(dx) > 0.6
+
+        console.log({ dy })
+        const trigger =
+          velocity > 0.4 || Math.abs(dx) > 0.6 || Math.abs(dy) > 0.17
 
         const rotateY =
           xDir > 0 ? lastRotation.current + 1 : lastRotation.current - 1
