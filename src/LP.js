@@ -4,7 +4,7 @@ import { DoubleSide, TextureLoader, VideoTexture } from "three"
 import VideoMaterial from "./VideoMaterial"
 import MorphMesh from "./MorphMesh"
 import { useDrag } from "react-use-gesture"
-import { useSpring, a } from "@react-spring/three"
+import { useSpring, a, config } from "@react-spring/three"
 import Background from "./Background"
 import useStore from "./store"
 import { useAspect } from "drei"
@@ -59,6 +59,8 @@ const LP = forwardRef(
         y: 1
       },
       reset: true
+
+      //config: config.gentle
     }))
 
     const [offset, setOffset] = useSpring(() => ({
@@ -99,9 +101,8 @@ const LP = forwardRef(
         let dy = my / window.innerHeight
         let dx = (mx / window.innerWidth) * 2
 
-        console.log({ dy })
         const trigger =
-          velocity > 0.4 || Math.abs(dx) > 0.6 || Math.abs(dy) > 0.17
+          velocity > 0.4 || Math.abs(dx) > 0.6 || Math.abs(dy) > 0.18
 
         const rotateY =
           xDir > 0 ? lastRotation.current + 1 : lastRotation.current - 1
@@ -130,13 +131,32 @@ const LP = forwardRef(
 
         // swipe left/right
         if (!down && trigger) {
-          setRotation({ y: rotateY })
+          setRotation({
+            y: rotateY,
+            config: {
+              mass: 1,
+              tension: 50
+            }
+          })
           setSide(side === "A" ? "B" : "A")
           lastRotation.current = rotateY
         } else if (!down) {
-          setRotation({ y: lastRotation.current })
+          setRotation({
+            y: lastRotation.current,
+            config: {
+              mass: 1,
+              tension: 50
+            }
+          })
         } else {
-          setRotation({ y: lastRotation.current + dx })
+          setRotation({
+            y: lastRotation.current + dx,
+            config: {
+              mass: 1,
+              tension: 120,
+              friction: 16
+            }
+          })
         }
       },
       {

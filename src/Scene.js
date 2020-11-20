@@ -104,7 +104,7 @@ export default function Scene() {
         intensity={0.6}
         color="#81D96C"
       />
-      <color attach="background" args={["#111"]} />
+      <color attach="background" args={["#130915"]} />
       <Suspense fallback={null}>
         <LP
           progress={progress}
