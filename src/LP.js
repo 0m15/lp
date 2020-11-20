@@ -7,18 +7,22 @@ import { useDrag } from "react-use-gesture"
 import { useSpring, a } from "@react-spring/three"
 import Background from "./Background"
 import useStore from "./store"
+import { useAspect } from "drei"
 
 extend({ VideoMaterial })
 
 const Vinyl = React.forwardRef((props, ref) => {
-  const [map] = useLoader(TextureLoader, ["/vinyl-a.png"])
+  const [map, normalMap] = useLoader(TextureLoader, [
+    "/vinyl-c.png",
+    "vinyl-c_norm.png"
+  ])
 
   return (
     <a.mesh {...props} ref={ref}>
       <circleBufferGeometry attach="geometry" args={[0.5, 64]} />
       <meshPhongMaterial
         map={map}
-        bumpScale={1}
+        normalMap={normalMap}
         attach="material"
         side={DoubleSide}
         transparent
@@ -31,7 +35,6 @@ const LP = forwardRef(
   (
     {
       mouse,
-      playingState,
       started,
       onStart = () => {},
       onPlay = () => {},
@@ -43,10 +46,11 @@ const LP = forwardRef(
     group
   ) => {
     const vinyl = useRef()
-
-    const { side, setSide } = useStore((state) => ({
+    const [scale] = useAspect("cover", 100, 100, 0.45)
+    const { side, setSide, playingState } = useStore((state) => ({
       side: state.side,
-      setSide: state.setSide
+      setSide: state.setSide,
+      playingState: state.playingState
     }))
 
     const [rotate, setRotation] = useSpring(() => ({
@@ -68,7 +72,7 @@ const LP = forwardRef(
     const lastRotation = useRef(0)
     const lastOffset = useRef(0)
 
-    useDrag(
+    const bind = useDrag(
       ({
         down,
         movement: [mx, my],
@@ -133,8 +137,8 @@ const LP = forwardRef(
         }
       },
       {
-        lockDirection: true,
-        domTarget: window
+        lockDirection: true
+        //domTarget: window
       }
     )
 
@@ -145,7 +149,9 @@ const LP = forwardRef(
     })
 
     return (
-      <>
+      <group
+        scale={[Math.min(1.5, scale), Math.min(1.5, scale), 1]}
+        {...bind()}>
         <a.group
           ref={group}
           {...props}
@@ -154,15 +160,13 @@ const LP = forwardRef(
           <Vinyl position-y={offset.y.to((d) => d * 2)} ref={vinyl} />
           <MorphMesh mouse={mouse} started={started} />
         </a.group>
-        <a.group
-          // position-z={offset.y.to((d) => d * 0.1)}
-          position-y={offset.y.to((d) => -d * 1.5)}>
+        <a.group position-y={offset.y.to((d) => -d * 1.5)}>
           <Background
             playingState={playingState === 3}
             position={[0, 0, 0.05]}
           />
         </a.group>
-      </>
+      </group>
     )
   }
 )

@@ -7,6 +7,7 @@ import {
   AudioAnalyser,
   DataTexture
 } from "three"
+import useStore from "./store"
 
 // const listener = new AudioListener()
 // const loader = new AudioLoader()
@@ -17,7 +18,12 @@ import {
 
 // const fftSize = 512
 
-export default function Player({ side = "A", dataTexture, isPlaying = false }) {
+export default function Player({ dataTexture }) {
+  const { side, playingState } = useStore((state) => ({
+    side: state.side,
+    playingState: state.playingState
+  }))
+
   const willPause = useRef(false)
   const audio = useMemo(
     () => document.getElementById(side === "A" ? "trackA" : "trackB"),
@@ -25,14 +31,14 @@ export default function Player({ side = "A", dataTexture, isPlaying = false }) {
   )
 
   useEffect(() => {
-    if (isPlaying === 2) {
+    if (playingState === 2) {
       audio.volume = 0.9
       audio.play()
       willPause.current = false
     } else {
       willPause.current = true
     }
-  }, [isPlaying, side])
+  }, [playingState, side])
 
   useFrame(() => {
     if (willPause.current && audio.volume > 0) {
