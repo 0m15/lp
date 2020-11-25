@@ -4,15 +4,24 @@ import React, { useRef } from "react"
 import { useFrame, useLoader } from "react-three-fiber"
 import { TextureLoader, MeshPhongMaterial } from "three"
 import { snoise } from "./shaders/snoise"
+import {
+  AudioLoader,
+  AudioListener,
+  Audio,
+  AudioAnalyser,
+  DataTexture
+} from "three"
 
 export const material = new MeshPhongMaterial()
 export let materialShader = null
 
 material.onBeforeCompile = (shader) => {
   shader.uniforms.mouse = { value: [0, 0] }
+  shader.uniforms.disp = { value: 0 }
   shader.uniforms.time = { value: 0 }
   // shader.vertexShader = `
   //   uniform float time;
+  //   uniform float disp;
   //   uniform vec2 mouse;
   //   uniform sampler2D bumpMap;
   //   uniform sampler2D normalMap;
@@ -24,9 +33,9 @@ material.onBeforeCompile = (shader) => {
   //   `
   //   vec3 transformed = vec3(position);
   //   vec2 offset = vec2(-mouse.x, mouse.y) * 0.25;
-  //   float d = 0.075;//texture2D(bumpMap, uv).z*0.1;
-  //   float displ = snoise(transformed*1.0+time*0.2) * d - d / 2.0;
-  //   transformed.xy += displ*d*(1.0-length(uv-0.5));
+  //   float d = 0.005;//0.075;//texture2D(bumpMap, uv).z*0.1;
+  //   float displ = snoise(transformed*disp*disp+time*0.2) * d - d / 2.0;
+  //   transformed.xy += displ*(1.0-length(uv-0.5));
   //   transformed.xy += offset*d;
   //   transformedNormal.xy += displ*d*(1.0-length(uv-0.5));
   //   transformedNormal.xy += offset*d;
@@ -57,23 +66,19 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
     //"/cover_disp.jpg"
   ])
 
-  // useFrame(({ clock, frames, ...props }) => {
-  //   if (!mesh.current) return
+  useFrame(({ clock, frames, ...props }) => {
+    if (!mesh.current) return
 
-  //   const t = clock.getElapsedTime()
+    const t = clock.getElapsedTime()
 
-  //   if (materialShader) {
-  //     materialShader.uniforms.time.value = t
-  //     materialShader.uniforms.mouse.value = [
-  //       lerp(materialShader.uniforms.mouse.value[0], mouse[0], 0.015),
-  //       lerp(materialShader.uniforms.mouse.value[1], mouse[1], 0.025)
-  //     ]
-  //   }
-  // })
+    if (materialShader) {
+      materialShader.uniforms.time.value = t
+    }
+  })
 
   return (
     <mesh ref={mesh} {...props}>
-      <boxBufferGeometry args={[1, 1, 0.02]} attach="geometry" />
+      <boxBufferGeometry args={[1, 1, 0.02, 128, 128]} attach="geometry" />
       <primitive
         object={material}
         attach="material"

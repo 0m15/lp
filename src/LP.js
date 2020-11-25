@@ -7,7 +7,7 @@ import { useDrag } from "react-use-gesture"
 import { useSpring, a, config } from "@react-spring/three"
 import Background from "./Background"
 import useStore from "./store"
-import { useAspect } from "drei"
+import { Text, useAspect } from "drei"
 
 extend({ VideoMaterial })
 
@@ -188,7 +188,26 @@ const LP = forwardRef(
           ref={group}
           rotation-y={rotate.y.to((d) => d * Math.PI)}
           position-y={offset.y.to((d) => -d * 1.5)}>
-          <Vinyl position-y={offset.y.to((d) => d * 2)} ref={vinyl} />
+          <a.group ref={vinyl} position-y={offset.y.to((d) => d * 2)}>
+            <Vinyl />
+            <Text
+              fontWeight="bold"
+              color="#111"
+              fontSize={0.035}
+              position-x={0.165}
+              position-z={0.001}>
+              Side A
+            </Text>
+            <Text
+              fontWeight="bold"
+              color="#111"
+              fontSize={0.035}
+              position-x={0.165}
+              position-z={-0.001}
+              rotation-y={Math.PI}>
+              Side B
+            </Text>
+          </a.group>
           <MorphMesh mouse={mouse} started={started} />
         </a.group>
         <a.group position-y={offset.y.to((d) => -d * 1.5)}>

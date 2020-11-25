@@ -14,21 +14,8 @@ import Player from "./Player"
 import Ui from "./Ui"
 import useStore from "./store"
 
-const zoomIn = new Vector3(0, 0, 5)
-
-function ZoomIn({ to = zoomIn } = {}) {
-  useFrame(({ camera }) => {
-    camera.position.lerp(to, 0.05)
-  })
-
-  return null
-}
-
-const lookAt = new Vector3(0, 0, 0)
-
 export default function Scene() {
   const lp = useRef()
-  const lastSide = useRef("A")
   const hasInteracted = useRef(false)
 
   const { playingState, side, setPlayingState } = useStore((state) => ({
@@ -51,10 +38,6 @@ export default function Scene() {
   useFrame(({ clock, camera }) => {
     input.current[0] = _mouse.x
     input.current[1] = _mouse.y
-
-    // lookAt.x = lerp(lookAt.x, input.current[0] * 0.2, 0.0075)
-    // lookAt.y = lerp(lookAt.y, input.current[1] * 0.2, 0.005)
-    // camera.lookAt(lookAt)
 
     //detect interaction to show hints
     if (hasInteracted.current) {
