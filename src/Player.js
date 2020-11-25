@@ -22,7 +22,7 @@ export default function Player({ dataTexture }) {
   )
 
   useEffect(() => {
-    if (playingState === 2 || playingState === 3) {
+    if (playingState === 2) {
       audio.volume = 0.9
       audio.play()
       willPause.current = false
@@ -35,6 +35,7 @@ export default function Player({ dataTexture }) {
     if (willPause.current && audio.volume > 0) {
       audio.volume = Math.max(0, audio.volume - 0.015)
     } else if (audio.volume <= 0) {
+      willPause.current = false
       audio.pause()
     }
   })
