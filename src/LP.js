@@ -213,7 +213,7 @@ const LP = forwardRef(
             <Text
               fontWeight="bold"
               color="#111"
-              fontSize={0.035}
+              fontSize={0.025}
               position-x={0.165}
               position-z={0.001}>
               LATO A
@@ -221,7 +221,7 @@ const LP = forwardRef(
             <Text
               fontWeight="bold"
               color="#111"
-              fontSize={0.035}
+              fontSize={0.025}
               position-x={-0.165}
               position-z={-0.001}
               rotation-y={Math.PI}>
