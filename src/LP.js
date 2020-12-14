@@ -230,7 +230,7 @@ const LP = forwardRef(
             <Text
               fontWeight="bold"
               color="#111"
-              fontSize={0.025}
+              fontSize={0.02}
               position-y={-0.15}
               position-z={0.001}
               textAlign="center">
@@ -239,7 +239,7 @@ const LP = forwardRef(
             <Text
               fontWeight="bold"
               color="#111"
-              fontSize={0.025}
+              fontSize={0.02}
               position-y={-0.15}
               position-z={-0.001}
               rotation-y={Math.PI}
