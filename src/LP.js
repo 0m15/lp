@@ -1,4 +1,10 @@
-import React, { forwardRef, useCallback, useRef, useState } from "react"
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from "react"
 import { extend, useFrame, useLoader, useThree } from "react-three-fiber"
 import { DoubleSide, TextureLoader, VideoTexture } from "three"
 import VideoMaterial from "./VideoMaterial"
@@ -11,11 +17,20 @@ import { Text, useAspect } from "drei"
 
 extend({ VideoMaterial })
 
-const Vinyl = React.forwardRef((props, ref) => {
+const Vinyl = ({ side, ...props }) => {
+  const ref = useRef()
   const [map, normalMap] = useLoader(TextureLoader, [
     "/vinyl-c.png",
     "vinyl-c_norm.png"
   ])
+
+  useEffect(() => {
+    if (side === "B") {
+      ref.current.scale.x = -1
+    } else {
+      ref.current.scale.x = 1
+    }
+  }, [map, side])
 
   return (
     <a.mesh {...props} ref={ref}>
@@ -29,7 +44,7 @@ const Vinyl = React.forwardRef((props, ref) => {
       />
     </a.mesh>
   )
-})
+}
 
 const LP = forwardRef(
   (
@@ -189,23 +204,42 @@ const LP = forwardRef(
           rotation-y={rotate.y.to((d) => d * Math.PI)}
           position-y={offset.y.to((d) => -d * 1.5)}>
           <a.group ref={vinyl} position-y={offset.y.to((d) => d * 2)}>
-            <Vinyl />
+            <Vinyl side={side} />
             <Text
               fontWeight="bold"
               color="#111"
               fontSize={0.035}
               position-x={0.165}
               position-z={0.001}>
-              Side A
+              LATO A
             </Text>
             <Text
               fontWeight="bold"
               color="#111"
               fontSize={0.035}
-              position-x={0.165}
+              position-x={-0.165}
               position-z={-0.001}
               rotation-y={Math.PI}>
-              Side B
+              LATO B
+            </Text>
+            <Text
+              fontWeight="bold"
+              color="#111"
+              fontSize={0.025}
+              position-y={-0.15}
+              position-z={0.001}
+              textAlign="center">
+              "Niente"{"\n"}(Palamidessi, Di Palma)
+            </Text>
+            <Text
+              fontWeight="bold"
+              color="#111"
+              fontSize={0.025}
+              position-y={-0.15}
+              position-z={-0.001}
+              rotation-y={Math.PI}
+              textAlign="center">
+              "Due"{"\n"}(Palamidessi, Di Palma)
             </Text>
           </a.group>
           <MorphMesh mouse={mouse} started={started} />
