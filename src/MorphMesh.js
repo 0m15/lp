@@ -60,9 +60,10 @@ material.onBeforeCompile = (shader) => {
 export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
   const mesh = useRef()
 
-  const [map, normalMap, bumpMap] = useLoader(TextureLoader, [
+  const [map, normalMap, map1] = useLoader(TextureLoader, [
     "/cover_color.jpg",
-    "/cover_norm.jpg"
+    "/cover_norm.jpg",
+    "/cover-back.jpg"
     //"/cover_disp.jpg"
   ])
 
@@ -79,10 +80,22 @@ export default function MorphMesh({ started, mouse, onPointerDown, ...props }) {
   return (
     <mesh ref={mesh} {...props}>
       <boxBufferGeometry args={[1, 1, 0.02, 128, 128]} attach="geometry" />
-      <primitive
+      <meshPhongMaterial object={material} attachArray="material" map={map} />
+      <meshPhongMaterial object={material} attachArray="material" map={map} />
+      <meshPhongMaterial object={material} attachArray="material" map={map} />
+      <meshPhongMaterial object={material} attachArray="material" map={map1} />
+      <meshPhongMaterial
         object={material}
-        attach="material"
+        attachArray="material"
         map={map}
+        normalMap={normalMap}
+        normalScale={[0.4, 0.4]}
+        specularColor="darkgray"
+      />
+      <meshPhongMaterial
+        object={material}
+        attachArray="material"
+        map={map1}
         normalMap={normalMap}
         normalScale={[0.4, 0.4]}
         specularColor="darkgray"

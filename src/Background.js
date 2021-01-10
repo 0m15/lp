@@ -27,7 +27,6 @@ videoTexture.wrapT = MirroredRepeatWrapping
 export default function Background({ mouse, playingState, ...props }) {
   const mesh = useRef()
   const { size, viewport } = useThree()
-  const scale = useAspect("cover", size.width, size.height, 1)
 
   const [map, noise] = useLoader(TextureLoader, [
     "/cover_color.jpg",

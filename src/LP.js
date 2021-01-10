@@ -19,29 +19,29 @@ extend({ VideoMaterial })
 
 const Vinyl = ({ side, ...props }) => {
   const ref = useRef()
-  const [map, normalMap] = useLoader(TextureLoader, [
-    "/vinyl-c.png",
-    "vinyl-c_norm.png"
-  ])
+  const [map, map1] = useLoader(TextureLoader, ["/vinyl-c.png", "/vinyl-b.png"])
 
   useEffect(() => {
-    if (side === "B") {
-      ref.current.scale.x = -1
-    } else {
-      ref.current.scale.x = 1
-    }
+    // if (side === "B") {
+    //   ref.current.scale.x = -1
+    // } else {
+    //   ref.current.scale.x = 1
+    // }
   }, [map, side])
 
   return (
-    <a.mesh {...props} ref={ref}>
-      <circleBufferGeometry attach="geometry" args={[0.5, 64]} />
-      <meshPhongMaterial
-        map={map}
-        normalMap={normalMap}
-        attach="material"
-        side={DoubleSide}
-        transparent
+    <a.mesh
+      {...props}
+      ref={ref}
+      rotation-y={Math.PI / 2}
+      rotation-x={Math.PI / 2}>
+      <cylinderBufferGeometry
+        attach="geometry"
+        args={[0.5, 0.5, 0.005, 32, 32]}
       />
+      <meshPhongMaterial attachArray="material" opacity={0} transparent />
+      <meshPhongMaterial map={map} attachArray="material" transparent />
+      <meshPhongMaterial map={map1} attachArray="material" transparent />
     </a.mesh>
   )
 }
@@ -133,8 +133,7 @@ const LP = forwardRef(
             setOffset({ y: lastOffset.current })
           } else {
             setOffset({
-              y: lastOffset.current - dy,
-              bounds: { top: 0.01, bottom: 0.01, left: 0, right: 0 },
+              y: Math.max(0, Math.min(0.5, lastOffset.current - dy)),
               rubberband: true
             })
           }
@@ -210,7 +209,7 @@ const LP = forwardRef(
           position-y={offset.y.to((d) => -d * 1.5)}>
           <a.group ref={vinyl} position-y={offset.y.to((d) => d * 2)}>
             <Vinyl side={side} />
-            <Text
+            {/* <Text
               fontWeight="bold"
               color="#111"
               fontSize={0.025}
@@ -245,7 +244,7 @@ const LP = forwardRef(
               rotation-y={Math.PI}
               textAlign="center">
               "Due"{"\n"}(Palamidessi, Di Palma)
-            </Text>
+            </Text> */}
           </a.group>
           <MorphMesh mouse={mouse} started={started} />
         </a.group>
