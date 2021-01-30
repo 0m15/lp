@@ -98,7 +98,7 @@ export default function Scene() {
           onStop={onStop}
           onPlay={onPlay}
           onPause={onPause}
-          onPlayVideo={onPlayVideo}
+          //onPlayVideo={onPlayVideo}
         />
       </Suspense>
       <Player side={side} />

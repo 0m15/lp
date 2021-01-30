@@ -5,7 +5,8 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUUpLeft,
-  Plus
+  Plus,
+  YoutubeLogo
 } from "phosphor-react"
 import { Keyframes, animated, config } from "react-spring/renderprops"
 import delay from "delay"
@@ -122,23 +123,32 @@ export default function Ui({ progress, hintVisibility }) {
         onClick={() => {
           setIsMenuOpen(!isMenuOpen)
         }}>
-        <Plus color=" rgb(234, 112, 255)" size={40} />
+        <YoutubeLogo color=" rgb(234, 112, 255)" size={40} />
       </Transition>
-      <Transition prop={isMenuOpen} className="ui full">
+      <Transition prop={isMenuOpen} className="ui bottom menu">
         <div>
-          <Reveal height={30} style={menuItems[0]} className="fs2 mb oh">
+          <Reveal height={30} style={menuItems[0]} className="fs3 mb oh">
             spotify
           </Reveal>
-          <Reveal height={30} style={menuItems[1]} className="fs2 mb oh">
+          <Reveal height={30} style={menuItems[1]} className="fs3 mb oh">
             youtube
           </Reveal>
-          <Reveal height={30} style={menuItems[2]} className="fs2 mb oh">
+          <Reveal height={30} style={menuItems[2]} className="fs3 mb oh">
             link 1
           </Reveal>
-          <Reveal height={30} style={menuItems[3]} className="fs2 mb oh">
+          <Reveal height={30} style={menuItems[3]} className="fs3 mb oh">
             link 2
           </Reveal>
         </div>
+      </Transition>
+      <Transition prop={isMenuOpen} className="ui full">
+        <iframe
+          width="720"
+          height="403"
+          src="https://www.youtube.com/embed/2Z4m4lnjxkY?controls=0&rel=0"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen></iframe>
       </Transition>
       <Transition
         prop={isMenuOpen}
