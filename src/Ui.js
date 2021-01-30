@@ -143,12 +143,10 @@ export default function Ui({ progress, hintVisibility }) {
       </Transition>
       <Transition prop={isMenuOpen} className="ui full">
         <iframe
+          src="https://www.youtube.com/embed/t_oCaVYruxI?autoplay=1&loop=1&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&theme=light"
           width="720"
-          height="403"
-          src="https://www.youtube.com/embed/2Z4m4lnjxkY?controls=0&rel=0"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen></iframe>
+          height="480"
+          frameborder="0"></iframe>
       </Transition>
       <Transition
         prop={isMenuOpen}
