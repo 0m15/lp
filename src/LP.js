@@ -19,7 +19,7 @@ extend({ VideoMaterial })
 
 const Vinyl = ({ side, ...props }) => {
   const ref = useRef()
-  const [map, map1] = useLoader(TextureLoader, ["/vinyl-c.png", "/vinyl-b.png"])
+  const [map, map1] = useLoader(TextureLoader, ["/vinyl-a.png", "/vinyl-b.png"])
 
   useEffect(() => {
     // if (side === "B") {
