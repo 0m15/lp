@@ -283,28 +283,28 @@
     <audio src="/due-192.mp3" id="trackB" autoplay="0"></audio>
 
     <script>
-      let isUnlocked = false
-      let context = new AudioContext()
+      // let isUnlocked = false
+      // let context = new AudioContext()
 
-      window.addEventListener("click", () => {
-        if (isUnlocked) return
-        var buffer = context.createBuffer(1, 1, 22050)
-        var source = context.createBufferSource()
-        source.source.buffer = buffer
-        source.connect(context.destination)
-        source.start(0)
-        source.stop()
+      // window.addEventListener("click", () => {
+      //   if (isUnlocked) return
+      //   var buffer = context.createBuffer(1, 1, 22050)
+      //   var source = context.createBufferSource()
+      //   source.source.buffer = buffer
+      //   source.connect(context.destination)
+      //   source.start(0)
+      //   source.stop()
 
-        // by checking the play state after some time, we know if we're really unlocked
-        setTimeout(function () {
-          if (
-            source.playbackState === source.PLAYING_STATE ||
-            source.playbackState === source.FINISHED_STATE
-          ) {
-            isUnlocked = true
-          }
-        }, 0)
-      })
+      //   // by checking the play state after some time, we know if we're really unlocked
+      //   setTimeout(function () {
+      //     if (
+      //       source.playbackState === source.PLAYING_STATE ||
+      //       source.playbackState === source.FINISHED_STATE
+      //     ) {
+      //       isUnlocked = true
+      //     }
+      //   }, 0)
+      // })
     </script>
   </body>
 </html>
