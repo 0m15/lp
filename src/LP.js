@@ -182,9 +182,9 @@ const LP = forwardRef(
     let vel = useRef(0)
     useFrame(() => {
       if (playingState === 2 && vel.current < 0.03) {
-        vel.current += 0.0005
+        vel.current += 0.001
       } else if (playingState !== 2 && Math.abs(vel.current) > 0) {
-        vel.current -= 0.0005
+        vel.current -= 0.001
       }
 
       vinyl.current.rotation.z -= side === "A" ? vel.current : -vel.current

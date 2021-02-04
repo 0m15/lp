@@ -30,12 +30,16 @@
       }
 
       /* font */
-      html,
       body {
         background: #111;
         font-family: Arial, Helvetica, sans-serif;
         color: rgb(234, 112, 255);
         font-size: 12px;
+      }
+
+      body.sideB {
+        background: #e6e2e8;
+        color: #f294b1;
       }
 
       /* positioning */
@@ -275,8 +279,8 @@
       <source src="/niente-480p.mp4" type="video/mp4" />
     </video>
 
-    <audio src="/niente-192.mp3" id="trackA"></audio>
-    <audio src="/due-192.mp3" id="trackB"></audio>
+    <audio src="/niente-192.mp3" id="trackA" autoplay="0"></audio>
+    <audio src="/due-192.mp3" id="trackB" autoplay="0"></audio>
 
     <script>
       let isUnlocked = false

@@ -1,3 +1,4 @@
+import { Html, useProgress } from "drei"
 import React, {
   Suspense,
   useCallback,
@@ -5,14 +6,11 @@ import React, {
   useRef,
   useState
 } from "react"
-import { Html, useProgress } from "drei"
 import { useFrame, useThree } from "react-three-fiber"
-import { Vector3 } from "three"
 import LP from "./LP"
-import useAccelerometer from "./MotionSensor"
 import Player from "./Player"
-import Ui from "./Ui"
 import useStore from "./store"
+import Ui from "./Ui"
 
 export default function Scene() {
   const lp = useRef()
@@ -30,16 +28,21 @@ export default function Scene() {
 
   useEffect(() => {
     if ((side !== "A" || playingState > 0) && !hasInteracted.current) {
-      console.log("xxx")
       hasInteracted.current = true
+    }
+
+    if (side === "A") {
+      document.body.classList.remove("sideB")
+    } else {
+      document.body.classList.add("sideB")
     }
   }, [side, playingState])
 
-  useFrame(({ clock, camera }) => {
+  useFrame(({ clock }) => {
     input.current[0] = _mouse.x
     input.current[1] = _mouse.y
 
-    //detect interaction to show hints
+    //detect interaction to hide hints
     if (hasInteracted.current) {
       if (hintVisibility !== "off") setHintVisibility("off")
       return
@@ -61,25 +64,18 @@ export default function Scene() {
   const onPlay = useCallback(() => {
     setPlayingState(2)
   }, [])
-  const onPlayVideo = useCallback(() => {
-    setPlayingState(3)
-  }, [])
+  // const onPlayVideo = useCallback(() => {
+  //   setPlayingState(3)
+  // }, [])
   const onPause = useCallback(() => {
     setPlayingState(1)
   }, [])
 
   const input = useRef([0, 0, 0])
 
-  useAccelerometer({
-    onMotion: (acceleration) =>
-      void ((input.current[0] = acceleration[0]),
-      (input.current[1] = acceleration[1]),
-      (input.current[2] = acceleration[2]))
-  })
-
   return (
     <>
-      <color attach="background" args={["white"]} />
+      <color attach="background" args={["black", 0]} />
       <ambientLight intensity={1} />
       <pointLight position={[150, 10, 100]} intensity={0.6} color="#AC3BDD" />
       <pointLight
@@ -87,7 +83,6 @@ export default function Scene() {
         intensity={0.6}
         color="#81D96C"
       />
-      <color attach="background" args={["#130915"]} />
       <Suspense fallback={null}>
         <LP
           progress={progress}

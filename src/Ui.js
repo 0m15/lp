@@ -100,8 +100,8 @@ export default function Ui({ progress, hintVisibility }) {
         <Hint state={hintVisibility} native>
           {(styles) => (
             <animated.div style={{ marginTop: 480, ...styles }}>
-              <ArrowLeft color=" rgb(234, 112, 255)" size={20} />
-              <ArrowRight color=" rgb(234, 112, 255)" size={20} />
+              <ArrowLeft color="currentColor" size={20} />
+              <ArrowRight color="currentColor" size={20} />
               <div className="ls5">swipe/scroll</div>
             </animated.div>
           )}
@@ -111,7 +111,7 @@ export default function Ui({ progress, hintVisibility }) {
             <animated.div
               className="abs"
               style={{ marginLeft: -320, ...styles }}>
-              <ArrowBendLeftUp color=" rgb(234, 112, 255)" size={20} />
+              <ArrowBendLeftUp color="currentColor" size={20} />
             </animated.div>
           )}
         </Hint>
@@ -123,7 +123,7 @@ export default function Ui({ progress, hintVisibility }) {
         onClick={() => {
           setIsMenuOpen(!isMenuOpen)
         }}>
-        <YoutubeLogo color=" rgb(234, 112, 255)" size={40} />
+        <YoutubeLogo color="currentColor" size={40} />
       </Transition>
       <Transition prop={isMenuOpen} className="ui bottom menu">
         <div>
@@ -146,6 +146,7 @@ export default function Ui({ progress, hintVisibility }) {
           src="https://www.youtube.com/embed/t_oCaVYruxI?autoplay=1&loop=1&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&theme=light"
           width="720"
           height="480"
+          style={{ marginTop: -30 }}
           frameborder="0"></iframe>
       </Transition>
       <Transition
@@ -154,7 +155,7 @@ export default function Ui({ progress, hintVisibility }) {
         onClick={() => {
           setIsMenuOpen(!isMenuOpen)
         }}>
-        <ArrowUUpLeft color=" rgb(234, 112, 255)" size={40} />
+        <ArrowUUpLeft color="currentColor" size={40} />
       </Transition>
     </div>
   )
