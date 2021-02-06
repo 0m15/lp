@@ -1,16 +1,6 @@
-import { useAspect } from "drei"
-import lerp from "lerp"
 import React, { useRef } from "react"
 import { useFrame, useLoader } from "react-three-fiber"
-import { TextureLoader, MeshPhongMaterial } from "three"
-import { snoise } from "./shaders/snoise"
-import {
-  AudioLoader,
-  AudioListener,
-  Audio,
-  AudioAnalyser,
-  DataTexture
-} from "three"
+import { MeshPhongMaterial, TextureLoader } from "three"
 
 export const material = new MeshPhongMaterial()
 export let materialShader = null

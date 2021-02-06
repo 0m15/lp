@@ -8,7 +8,6 @@ import "./styles.css"
 
 function App() {
   const gpu = useDetectGPU()
-  console.log({ gpu })
 
   return (
     <Canvas

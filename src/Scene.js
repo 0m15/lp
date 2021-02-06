@@ -31,11 +31,11 @@ export default function Scene() {
       hasInteracted.current = true
     }
 
-    if (side === "A") {
-      document.body.classList.remove("sideB")
-    } else {
-      document.body.classList.add("sideB")
-    }
+    // if (side === "A") {
+    //   document.body.classList.remove("sideB")
+    // } else {
+    //   document.body.classList.add("sideB")
+    // }
   }, [side, playingState])
 
   useFrame(({ clock }) => {
@@ -75,7 +75,7 @@ export default function Scene() {
 
   return (
     <>
-      <color attach="background" args={["black", 0]} />
+      {/* <color attach="background" args={["black", 0]} /> */}
       <ambientLight intensity={1} />
       <pointLight position={[150, 10, 100]} intensity={0.6} color="#AC3BDD" />
       <pointLight

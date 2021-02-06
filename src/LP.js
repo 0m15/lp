@@ -1,19 +1,12 @@
-import React, {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from "react"
-import { extend, useFrame, useLoader, useThree } from "react-three-fiber"
-import { DoubleSide, TextureLoader, VideoTexture } from "three"
-import VideoMaterial from "./VideoMaterial"
-import MorphMesh from "./MorphMesh"
+import { a, useSpring } from "@react-spring/three"
+import { useAspect } from "drei"
+import React, { forwardRef, useEffect, useRef } from "react"
+import { extend, useFrame, useLoader } from "react-three-fiber"
 import { useDrag } from "react-use-gesture"
-import { useSpring, a, config } from "@react-spring/three"
-import Background from "./Background"
+import { TextureLoader } from "three"
+import MorphMesh from "./MorphMesh"
 import useStore from "./store"
-import { Text, useAspect } from "drei"
+import VideoMaterial from "./VideoMaterial"
 
 extend({ VideoMaterial })
 
@@ -39,9 +32,9 @@ const Vinyl = ({ side, ...props }) => {
         attach="geometry"
         args={[0.5, 0.5, 0.005, 32, 32]}
       />
-      <meshPhongMaterial attachArray="material" opacity={0} transparent />
-      <meshPhongMaterial map={map} attachArray="material" transparent />
-      <meshPhongMaterial map={map1} attachArray="material" transparent />
+      <meshBasicMaterial attachArray="material" opacity={0} transparent />
+      <meshBasicMaterial map={map} attachArray="material" transparent />
+      <meshBasicMaterial map={map1} attachArray="material" transparent />
     </a.mesh>
   )
 }
@@ -74,7 +67,6 @@ const LP = forwardRef(
         y: 1
       },
       reset: true
-
       //config: config.gentle
     }))
 
@@ -181,7 +173,7 @@ const LP = forwardRef(
 
     let vel = useRef(0)
     useFrame(() => {
-      if (playingState === 2 && vel.current < 0.075) {
+      if (playingState === 2 && vel.current < 0.05) {
         vel.current += 0.0005
         vel.current = Math.min(vel.current, 0.05)
       } else if (playingState !== 2 && Math.abs(vel.current) > 0.0) {
@@ -197,64 +189,22 @@ const LP = forwardRef(
         {...props}
         scale={[Math.min(1.5, scale), Math.min(1.5, scale), 1]}
         {...bind()}>
-        <group
+        {/* <group
           scale={[scale, Math.min(1.25, scale), 1]}
           position={[0, 0, -0.5]}>
           <mesh>
             <planeBufferGeometry args={[1, 1, 1]} />
             <meshBasicMaterial transparent opacity={0} />
           </mesh>
-        </group>
+        </group> */}
         <a.group
           ref={group}
           rotation-y={rotate.y.to((d) => d * Math.PI)}
           position-y={offset.y.to((d) => -d * 1.5)}>
           <a.group ref={vinyl} position-y={offset.y.to((d) => d * 2)}>
             <Vinyl side={side} />
-            {/* <Text
-              fontWeight="bold"
-              color="#111"
-              fontSize={0.025}
-              position-x={0.165}
-              position-z={0.001}>
-              LATO A
-            </Text>
-            <Text
-              fontWeight="bold"
-              color="#111"
-              fontSize={0.025}
-              position-x={-0.165}
-              position-z={-0.001}
-              rotation-y={Math.PI}>
-              LATO B
-            </Text>
-            <Text
-              fontWeight="bold"
-              color="#111"
-              fontSize={0.02}
-              position-y={-0.15}
-              position-z={0.001}
-              textAlign="center">
-              "Niente"{"\n"}(Palamidessi, Di Palma)
-            </Text>
-            <Text
-              fontWeight="bold"
-              color="#111"
-              fontSize={0.02}
-              position-y={-0.15}
-              position-z={-0.001}
-              rotation-y={Math.PI}
-              textAlign="center">
-              "Due"{"\n"}(Palamidessi, Di Palma)
-            </Text> */}
           </a.group>
           <MorphMesh mouse={mouse} started={started} />
-        </a.group>
-        <a.group position-y={offset.y.to((d) => -d * 1.5)}>
-          <Background
-            playingState={playingState === 3}
-            position={[0, 0, 0.05]}
-          />
         </a.group>
       </group>
     )

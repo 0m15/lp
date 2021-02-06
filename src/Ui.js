@@ -1,15 +1,14 @@
-import React, { useEffect, useRef, useState } from "react"
-import { a, useTransition, useTrail, useSpring } from "@react-spring/web"
+import { a, useSpring, useTrail, useTransition } from "@react-spring/web"
+import delay from "delay"
 import {
   ArrowBendLeftUp,
   ArrowLeft,
   ArrowRight,
   ArrowUUpLeft,
-  Plus,
   YoutubeLogo
 } from "phosphor-react"
-import { Keyframes, animated, config } from "react-spring/renderprops"
-import delay from "delay"
+import React, { useEffect, useState } from "react"
+import { animated, Keyframes } from "react-spring/renderprops"
 
 function Transition({
   prop,
@@ -133,18 +132,15 @@ export default function Ui({ progress, hintVisibility }) {
           <Reveal height={30} style={menuItems[1]} className="fs3 mb oh">
             youtube
           </Reveal>
-          <Reveal height={30} style={menuItems[2]} className="fs3 mb oh">
-            link 1
-          </Reveal>
-          <Reveal height={30} style={menuItems[3]} className="fs3 mb oh">
-            link 2
+          <Reveal height={30} style={menuItems[1]} className="fs3 mb oh">
+            link
           </Reveal>
         </div>
       </Transition>
       <Transition prop={isMenuOpen} className="ui full">
         <iframe
           src="https://www.youtube.com/embed/t_oCaVYruxI?autoplay=1&loop=1&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&theme=light"
-          width="720"
+          width="100%"
           height="480"
           style={{ marginTop: -30 }}
           frameborder="0"></iframe>

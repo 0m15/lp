@@ -1,12 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { useFrame, useLoader, useThree, useUpdate } from "react-three-fiber"
-import {
-  AudioLoader,
-  AudioListener,
-  Audio,
-  AudioAnalyser,
-  DataTexture
-} from "three"
+import { useEffect, useMemo, useRef } from "react"
+import { useFrame } from "react-three-fiber"
 import useStore from "./store"
 
 export default function Player({ dataTexture }) {
