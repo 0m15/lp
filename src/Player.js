@@ -9,12 +9,15 @@ export default function Player({ dataTexture }) {
   }))
 
   const willPause = useRef(false)
-  const audio = useMemo(
-    () => document.getElementById(side === "A" ? "trackA" : "trackB"),
-    [side]
-  )
+  const audioA = document.getElementById("trackA")
+  const audioB = document.getElementById("trackB")
+
+  const audio = side === "A" ? audioA : audioB
 
   useEffect(() => {
+    if (side === "A" && audioB.volume > 0) audioB.volume = 0
+    if (side === "B" && audioA.volume > 0) audioA.volume = 0
+
     if (playingState === 2) {
       audio.volume = 0.9
       audio.play()

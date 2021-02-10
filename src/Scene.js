@@ -31,11 +31,11 @@ export default function Scene() {
       hasInteracted.current = true
     }
 
-    // if (side === "A") {
-    //   document.body.classList.remove("sideB")
-    // } else {
-    //   document.body.classList.add("sideB")
-    // }
+    if (side === "A") {
+      document.body.classList.remove("sideB")
+    } else {
+      document.body.classList.add("sideB")
+    }
   }, [side, playingState])
 
   useFrame(({ clock }) => {
@@ -98,7 +98,7 @@ export default function Scene() {
       </Suspense>
       <Player side={side} />
       <Html fullscreen>
-        <Ui progress={progress} hintVisibility={hintVisibility} />
+        <Ui progress={progress} hintVisibility={hintVisibility} side={side} />
       </Html>
     </>
   )

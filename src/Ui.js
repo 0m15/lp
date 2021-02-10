@@ -59,7 +59,7 @@ const Hint = Keyframes.Spring({
   }
 })
 
-export default function Ui({ progress, hintVisibility }) {
+export default function Ui({ progress, hintVisibility, side }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const prog = useSpring({
@@ -75,7 +75,7 @@ export default function Ui({ progress, hintVisibility }) {
     }
   })
 
-  useEffect(() => {}, [])
+  const videoId = side === "A" ? "t_oCaVYruxI" : "Rh5NIarELt4"
 
   return (
     <div className="ui">
@@ -127,22 +127,36 @@ export default function Ui({ progress, hintVisibility }) {
       <Transition prop={isMenuOpen} className="ui bottom menu">
         <div>
           <Reveal height={30} style={menuItems[0]} className="fs3 mb oh">
-            spotify
+            <a
+              title="Brujas on spotify"
+              href="https://open.spotify.com/artist/2fyaN7UII85mJsKOkUrmcM">
+              spotify
+            </a>
           </Reveal>
           <Reveal height={30} style={menuItems[1]} className="fs3 mb oh">
-            youtube
+            <a
+              target="_blank"
+              title="Brujas on youtube"
+              href="https://www.youtube.com/channel/UCUDZ_56ZsDRS308o-khK8IA">
+              youtube
+            </a>
           </Reveal>
           <Reveal height={30} style={menuItems[1]} className="fs3 mb oh">
-            link
+            <a
+              target="_blank"
+              title="Brujas on instagram"
+              href="https://www.instagram.com/bru__jas/">
+              instagram
+            </a>
           </Reveal>
         </div>
       </Transition>
       <Transition prop={isMenuOpen} className="ui full">
         <iframe
-          src="https://www.youtube.com/embed/t_oCaVYruxI?autoplay=1&loop=1&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&theme=light"
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&theme=light`}
           width="100%"
           height="480"
-          style={{ marginTop: -30 }}
+          style={{ marginTop: -30, maxWidth: 1080 }}
           frameborder="0"></iframe>
       </Transition>
       <Transition
