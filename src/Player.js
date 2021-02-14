@@ -15,8 +15,14 @@ export default function Player({ dataTexture }) {
   const audio = side === "A" ? audioA : audioB
 
   useEffect(() => {
-    if (side === "A" && audioB.volume > 0) audioB.volume = 0
-    if (side === "B" && audioA.volume > 0) audioA.volume = 0
+    if (side === "A" && audioB.volume > 0) {
+      audioB.volume = 0
+      audioB.pause()
+    }
+    if (side === "B" && audioA.volume > 0) {
+      audioA.pause()
+      audioA.volume = 0
+    }
 
     if (playingState === 2) {
       audio.volume = 0.9
