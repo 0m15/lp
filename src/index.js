@@ -1,4 +1,3 @@
-import { useDetectGPU } from "drei"
 import React from "react"
 import ReactDOM from "react-dom"
 import { Canvas } from "react-three-fiber"
@@ -7,7 +6,7 @@ import Scene from "./Scene"
 import "./styles.css"
 
 function App() {
-  const gpu = useDetectGPU()
+  //const gpu = useDetectGPU()
 
   return (
     <Canvas

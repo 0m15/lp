@@ -7,7 +7,7 @@ import {
   ArrowUUpLeft,
   YoutubeLogo
 } from "phosphor-react"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { animated, Keyframes } from "react-spring/renderprops"
 
 function Transition({
@@ -126,27 +126,28 @@ export default function Ui({ progress, hintVisibility, side }) {
       </Transition>
       <Transition prop={isMenuOpen} className="ui bottom menu">
         <div>
-          <Reveal height={30} style={menuItems[0]} className="fs3 mb oh">
+          <Reveal height={40} style={menuItems[0]} className="fs3 mb oh">
             <a
+              target="_blank"
               title="Brujas on spotify"
               href="https://open.spotify.com/artist/2fyaN7UII85mJsKOkUrmcM">
-              spotify
+              <img width={40} height={40} src="/spotify-512.png" />
             </a>
           </Reveal>
-          <Reveal height={30} style={menuItems[1]} className="fs3 mb oh">
+          <Reveal height={40} style={menuItems[1]} className="fs3 mb oh">
             <a
               target="_blank"
               title="Brujas on youtube"
               href="https://www.youtube.com/channel/UCUDZ_56ZsDRS308o-khK8IA">
-              youtube
+              <img width={40} height={40} src="/youtube-512.webp" />
             </a>
           </Reveal>
-          <Reveal height={30} style={menuItems[1]} className="fs3 mb oh">
+          <Reveal height={40} style={menuItems[1]} className="fs3 mb oh">
             <a
               target="_blank"
               title="Brujas on instagram"
               href="https://www.instagram.com/bru__jas/">
-              instagram
+              <img width={40} height={40} src="/instagram-512.png" />
             </a>
           </Reveal>
         </div>

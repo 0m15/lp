@@ -1,26 +1,15 @@
 import { a, useSpring } from "@react-spring/three"
 import { useAspect } from "drei"
-import React, { forwardRef, useEffect, useRef } from "react"
-import { extend, useFrame, useLoader } from "react-three-fiber"
+import React, { forwardRef, useRef } from "react"
+import { useFrame, useLoader } from "react-three-fiber"
 import { useDrag } from "react-use-gesture"
 import { TextureLoader } from "three"
-import MorphMesh from "./MorphMesh"
+import Cover from "./Cover"
 import useStore from "./store"
-import VideoMaterial from "./VideoMaterial"
-
-extend({ VideoMaterial })
 
 const Vinyl = ({ side, ...props }) => {
   const ref = useRef()
   const [map, map1] = useLoader(TextureLoader, ["/vinyl-a.png", "/vinyl-b.png"])
-
-  useEffect(() => {
-    // if (side === "B") {
-    //   ref.current.scale.x = -1
-    // } else {
-    //   ref.current.scale.x = 1
-    // }
-  }, [map, side])
 
   return (
     <a.mesh
@@ -204,7 +193,7 @@ const LP = forwardRef(
           <a.group ref={vinyl} position-y={offset.y.to((d) => d * 2)}>
             <Vinyl side={side} />
           </a.group>
-          <MorphMesh mouse={mouse} started={started} />
+          <Cover mouse={mouse} started={started} />
         </a.group>
       </group>
     )

@@ -182,6 +182,7 @@
         padding: 1rem;
         width: fit-content;
         height: fit-content;
+        height: auto;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -281,7 +282,7 @@
         <div class="logo"></div>
       </div>
     </div>
-    <video
+    <!-- <video
       id="video"
       loop
       crossorigin="anonymous"
@@ -290,34 +291,9 @@
       style="display: none"
     >
       <source src="/niente-480p.mp4" type="video/mp4" />
-    </video>
+    </video> -->
 
-    <audio src="/niente-192.mp3" id="trackA" autoplay="0"></audio>
-    <audio src="/due-192.mp3" id="trackB" autoplay="0"></audio>
-
-    <script>
-      // let isUnlocked = false
-      // let context = new AudioContext()
-
-      // window.addEventListener("click", () => {
-      //   if (isUnlocked) return
-      //   var buffer = context.createBuffer(1, 1, 22050)
-      //   var source = context.createBufferSource()
-      //   source.source.buffer = buffer
-      //   source.connect(context.destination)
-      //   source.start(0)
-      //   source.stop()
-
-      //   // by checking the play state after some time, we know if we're really unlocked
-      //   setTimeout(function () {
-      //     if (
-      //       source.playbackState === source.PLAYING_STATE ||
-      //       source.playbackState === source.FINISHED_STATE
-      //     ) {
-      //       isUnlocked = true
-      //     }
-      //   }, 0)
-      // })
-    </script>
+    <audio src="/niente-192.mp3" id="trackA" autostart="0"></audio>
+    <audio src="/due-192.mp3" id="trackB" autostart="0"></audio>
   </body>
 </html>

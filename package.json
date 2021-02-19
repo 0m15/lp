@@ -16,6 +16,7 @@
     "@react-three/postprocessing": "^1.4.1",
     "delay": "^4.4.0",
     "drei": "^1.5.7",
+    "howler": "^2.2.1",
     "lerp": "^1.0.3",
     "phosphor-react": "^1.0.0",
     "postprocessing": "^6.17.3",
